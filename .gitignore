@@ -1,0 +1,31 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# Local databases and SQLite WAL/SHM files
+data/
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+
+# Local backups and staging archives
+backups/
+
+# Environment files and credentials
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# Build outputs
+client/dist/
+dist/
+
+# OS and IDE caches
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

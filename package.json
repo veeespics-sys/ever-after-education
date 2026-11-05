@@ -1,0 +1,31 @@
+{
+  "name": "thuto-bridge",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "node server/server.js",
+    "seed": "node server/db/seed.js",
+    "server": "node server/server.js",
+    "client": "npm.cmd --prefix client run dev",
+    "build": "npm.cmd --prefix client run build",
+    "dev": "concurrently \"node server/server.js\" \"npm.cmd --prefix client run dev\"",
+    "test": "node --test --test-concurrency=1 tests/*.test.js",
+    "backup": "node scripts/backup.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "better-sqlite3": "^13.0.3",
+    "cors": "^2.8.6",
+    "dotenv": "^18.0.7",
+    "express": "^5.3.0",
+    "jsonwebtoken": "^9.0.3"
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.6",
+    "supertest": "^7.3.1"
+  }
+}
