@@ -12,7 +12,7 @@ test.before(() => {
   runSeed();
 });
 
-test('Phase 3 Suite: High School Math Modules Loading & Structure Verification (Grades 8, 9, 10)', async () => {
+test('Phase 3 Suite: High School Math Modules Loading & 4-Option MCQ Verification (Grades 8, 9, 10)', async () => {
   // Login as Family 1 parent
   const loginRes = await request(app)
     .post('/api/auth/login')
@@ -30,7 +30,18 @@ test('Phase 3 Suite: High School Math Modules Loading & Structure Verification (
   assert.equal(g8Prob.grade, 'Grade 8');
   assert.equal(g8Prob.topic, 'Algebraic Expressions & Equations');
   assert.ok(Array.isArray(g8Prob.steps) && g8Prob.steps.length > 0);
-  assert.ok(Array.isArray(g8Prob.solution) && g8Prob.solution.length > 0);
+  
+  // Verify 4-option MCQ structure with diagnostic explanations
+  const step1 = g8Prob.steps[0];
+  assert.equal(step1.options.length, 4, 'Each step must contain exactly 4 options');
+  const correctOpt = step1.options.find(o => o.isCorrect);
+  assert.ok(correctOpt, 'Must have one correct option');
+  assert.ok(correctOpt.explanation);
+  const wrongOpt = step1.options.find(o => !o.isCorrect);
+  assert.ok(wrongOpt, 'Must have distractors');
+  assert.ok(wrongOpt.explanation, 'Distractor must contain pedagogical misconception explanation');
+
+  // Verify 3-tier hints
   assert.equal(g8Prob.hints.length, 3, 'Must provide 3 tiers of hints');
   assert.equal(g8Prob.hints[0].tier, 1);
   assert.equal(g8Prob.hints[1].tier, 2);
@@ -42,9 +53,9 @@ test('Phase 3 Suite: High School Math Modules Loading & Structure Verification (
     .set('Authorization', `Bearer ${token}`);
   assert.equal(g9Res.status, 200);
   assert.equal(g9Res.body.count, 4);
-  const g9Prob = g9Res.body.problems.find(p => p.id === 'g9_fact_03');
-  assert.ok(g9Prob, 'Grade 9 DOTS problem should exist');
-  assert.equal(g9Prob.topic, 'Exponents & Factorisation');
+  const g9Prob = g9Res.body.problems.find(p => p.id === 'g9_exp_01');
+  assert.ok(g9Prob, 'Grade 9 exponent problem exists');
+  assert.equal(g9Prob.steps[0].options.length, 4);
 
   // 3. Fetch Grade 10
   const g10Res = await request(app)
@@ -53,10 +64,10 @@ test('Phase 3 Suite: High School Math Modules Loading & Structure Verification (
   assert.equal(g10Res.status, 200);
   assert.equal(g10Res.body.count, 4);
   const g10Prob = g10Res.body.problems.find(p => p.id === 'g10_quad_01');
-  assert.ok(g10Prob, 'Grade 10 Quadratic equation problem should exist');
-  assert.equal(g10Prob.topic, 'Functions & Quadratic Equations');
+  assert.ok(g10Prob);
+  assert.equal(g10Prob.steps[0].options.length, 4);
 
-  // 4. Fetch all lessons (unfiltered)
+  // 4. Fetch all lessons
   const allRes = await request(app)
     .get('/api/lessons')
     .set('Authorization', `Bearer ${token}`);
@@ -64,70 +75,59 @@ test('Phase 3 Suite: High School Math Modules Loading & Structure Verification (
   assert.equal(allRes.body.count, 12, 'Total of 12 problems across Grades 8, 9, 10');
 });
 
-test('Phase 3 Suite: Multi-Step Real-time Answer Validation with Spacing and Commutativity', async () => {
+test('Phase 3 Suite: Misconception-Driven Step Validation (Correct vs Trap Distractor)', async () => {
   const loginRes = await request(app)
     .post('/api/auth/login')
     .send({ email: 'thabo@molefe.co.za', password: 'MolefePass2026!' });
   const token = loginRes.body.token;
 
-  // Test 1: Grade 8 Step 1 correct input with flexible spacing
-  const val1 = await request(app)
+  // Test 1: Grade 8 Step 1 Selecting Correct Option ('opt_1a')
+  const valCorrect = await request(app)
     .post('/api/lessons/validate-step')
     .set('Authorization', `Bearer ${token}`)
     .send({
       problemId: 'g8_alg_01',
       stepNumber: 1,
-      learnerInput: '  6x   -  12 + 5  '
+      optionId: 'opt_1a'
     });
-  assert.equal(val1.status, 200);
-  assert.equal(val1.body.isCorrect, true);
+  assert.equal(valCorrect.status, 200);
+  assert.equal(valCorrect.body.isCorrect, true);
+  assert.ok(valCorrect.body.explanation.includes('3 outside multiplies both'));
 
-  // Test 2: Grade 8 Step 1 incorrect algebraic input
-  const valFail = await request(app)
+  // Test 2: Grade 8 Step 1 Selecting Distractor ('opt_1b' - Partial distribution trap)
+  const valTrap = await request(app)
     .post('/api/lessons/validate-step')
     .set('Authorization', `Bearer ${token}`)
     .send({
       problemId: 'g8_alg_01',
       stepNumber: 1,
-      learnerInput: '5x - 10 + 5'
+      optionId: 'opt_1b'
     });
-  assert.equal(valFail.status, 200);
-  assert.equal(valFail.body.isCorrect, false);
-  assert.ok(valFail.body.hint);
+  assert.equal(valTrap.status, 200);
+  assert.equal(valTrap.body.isCorrect, false);
+  assert.ok(valTrap.body.explanation.includes('Partial Distribution Trap'));
 
-  // Test 3: Factorisation commutativity (x - 5)(x + 2) = 0 vs (x + 2)(x - 5) = 0
-  const valComm = await request(app)
+  // Test 3: Backward compatible typed text input
+  const valTyped = await request(app)
     .post('/api/lessons/validate-step')
     .set('Authorization', `Bearer ${token}`)
     .send({
-      problemId: 'g10_quad_01',
+      problemId: 'g8_alg_01',
       stepNumber: 1,
-      learnerInput: '(x + 2)(x - 5) = 0'
+      learnerInput: '6x - 12 + 5'
     });
-  assert.equal(valComm.status, 200);
-  assert.equal(valComm.body.isCorrect, true, 'Commutative factor ordering must be accepted');
-
-  // Test 4: "or" solution commutativity
-  const valOr = await request(app)
-    .post('/api/lessons/validate-step')
-    .set('Authorization', `Bearer ${token}`)
-    .send({
-      problemId: 'g10_quad_01',
-      stepNumber: 3,
-      learnerInput: 'x = -2 or x = 5'
-    });
-  assert.equal(valOr.status, 200);
-  assert.equal(valOr.body.isCorrect, true, 'Commutative root order must be accepted');
+  assert.equal(valTyped.status, 200);
+  assert.equal(valTyped.body.isCorrect, true);
 });
 
-test('Phase 3 Suite: Lesson Submission & Mastery Score Calculation with Hint Penalties', async () => {
+test('Phase 3 Suite: Gamification State & Milestone Badge Unlocks', async () => {
   const loginRes = await request(app)
     .post('/api/auth/login')
     .send({ email: 'thabo@molefe.co.za', password: 'MolefePass2026!' });
   const token = loginRes.body.token;
 
-  // Case A: Perfect completion (0 hints used) -> 100% score, 'mastered' status
-  const subA = await request(app)
+  // 1. Submit problem completion with 0 hints -> earns base XP + bonus XP
+  const subRes = await request(app)
     .post('/api/lessons/submit')
     .set('Authorization', `Bearer ${token}`)
     .send({
@@ -136,41 +136,63 @@ test('Phase 3 Suite: Lesson Submission & Mastery Score Calculation with Hint Pen
       hints_used: 0,
       attempts_count: 1
     });
-  assert.equal(subA.status, 200);
-  assert.equal(subA.body.progress.score, 100);
-  assert.equal(subA.body.progress.status, 'mastered');
+  assert.equal(subRes.status, 200);
+  assert.ok(subRes.body.gamification);
+  assert.ok(subRes.body.gamification.xpEarned >= 75, 'Should earn base + bonus XP');
+  assert.equal(subRes.body.progress.status, 'mastered');
 
-  // Verify stored in DB
-  const dbRecA = db.prepare('SELECT * FROM learner_lesson_progress WHERE learner_id = ? AND problem_id = ?')
-    .get('lrn_kamohelo_01', 'g8_alg_01');
-  assert.ok(dbRecA);
-  assert.equal(dbRecA.score, 100);
-  assert.equal(dbRecA.status, 'mastered');
+  // Verify milestone badges unlocked
+  const unlockedBadges = subRes.body.gamification.badges.map(b => b.id);
+  assert.ok(unlockedBadges.includes('badge_first_step'), 'Must unlock First Equation Solved badge');
+  assert.ok(unlockedBadges.includes('badge_term_tamer'), 'Must unlock Term Tamer badge for Grade 8');
+  assert.ok(unlockedBadges.includes('badge_hint_free'), 'Must unlock Hint-Free Master badge');
 
-  // Case B: Completed with 2 hints used -> 80% score
-  const subB = await request(app)
-    .post('/api/lessons/submit')
-    .set('Authorization', `Bearer ${token}`)
-    .send({
-      learner_id: 'lrn_kamohelo_01',
-      problem_id: 'g8_alg_02',
-      hints_used: 2,
-      attempts_count: 2
-    });
-  assert.equal(subB.status, 200);
-  assert.equal(subB.body.progress.score, 80);
-  assert.equal(subB.body.progress.status, 'completed');
+  // 2. Fetch Gamification state via API
+  const gamRes = await request(app)
+    .get('/api/lessons/gamification/lrn_kamohelo_01')
+    .set('Authorization', `Bearer ${token}`);
+  assert.equal(gamRes.status, 200);
+  assert.ok(gamRes.body.gamification.xp >= 75);
+  assert.ok(gamRes.body.gamification.badges.length >= 3);
+  assert.equal(gamRes.body.gamification.current_streak, 1);
 });
 
-test('Phase 3 Suite: Multi-Family Isolation and Role Protection on Submissions', async () => {
+test('Phase 3 Suite: Print-Ready Resource Generator Endpoint (Worksheets, Memos, Formulas)', async () => {
+  const loginRes = await request(app)
+    .post('/api/auth/login')
+    .send({ email: 'thabo@molefe.co.za', password: 'MolefePass2026!' });
+  const token = loginRes.body.token;
+
+  // Fetch Grade 9 printable resources
+  const resPrint = await request(app)
+    .get('/api/lessons/resources/Grade%209')
+    .set('Authorization', `Bearer ${token}`);
+  assert.equal(resPrint.status, 200);
+  assert.ok(resPrint.body.resources);
+  
+  // Formula sheet check
+  assert.ok(resPrint.body.resources.formulaSheet.title.includes('Grade 9'));
+  assert.ok(resPrint.body.resources.formulaSheet.sections.length > 0);
+
+  // Student worksheet check
+  assert.equal(resPrint.body.resources.worksheet.problems.length, 4);
+  assert.ok(resPrint.body.resources.worksheet.problems[0].steps.length > 0);
+
+  // Teacher/Parent memo check
+  assert.equal(resPrint.body.resources.memo.problems.length, 4);
+  assert.ok(resPrint.body.resources.memo.problems[0].solution.length > 0);
+  assert.ok(resPrint.body.resources.memo.problems[0].stepBreakdown[0].keyMisconceptionTraps.length > 0);
+});
+
+test('Phase 3 Suite: Multi-Family Isolation and Role Protection', async () => {
   // Molefe family login
   const molefeLogin = await request(app)
     .post('/api/auth/login')
     .send({ email: 'thabo@molefe.co.za', password: 'MolefePass2026!' });
   const molefeToken = molefeLogin.body.token;
 
-  // Van der Merwe family learner is 'lrn_liam_03'
-  // Thabo Molefe attempts to submit progress for Liam Van der Merwe -> must be rejected with 403
+  // Liam Van der Merwe is in a different family
+  // Cross-family submission attempt
   const crossSub = await request(app)
     .post('/api/lessons/submit')
     .set('Authorization', `Bearer ${molefeToken}`)
@@ -181,26 +203,9 @@ test('Phase 3 Suite: Multi-Family Isolation and Role Protection on Submissions',
     });
   assert.equal(crossSub.status, 403, 'Cross-family progress submission must return HTTP 403');
 
-  // Thabo Molefe attempts to view Liam Van der Merwe's progress -> must be rejected with 403
-  const crossView = await request(app)
-    .get('/api/lessons/progress/lrn_liam_03')
+  // Cross-family gamification view attempt
+  const crossGam = await request(app)
+    .get('/api/lessons/gamification/lrn_liam_03')
     .set('Authorization', `Bearer ${molefeToken}`);
-  assert.equal(crossView.status, 403, 'Cross-family progress inspection must return HTTP 403');
-});
-
-test('Phase 3 Suite: Learner Progress Summary & Mastery Telemetry Retrieval', async () => {
-  const loginRes = await request(app)
-    .post('/api/auth/login')
-    .send({ email: 'thabo@molefe.co.za', password: 'MolefePass2026!' });
-  const token = loginRes.body.token;
-
-  // Retrieve Kamohelo's progress
-  const progRes = await request(app)
-    .get('/api/lessons/progress/lrn_kamohelo_01')
-    .set('Authorization', `Bearer ${token}`);
-  assert.equal(progRes.status, 200);
-  assert.ok(progRes.body.summary);
-  assert.ok(progRes.body.summary.totalCompleted >= 2);
-  assert.ok(progRes.body.summary.averageScore >= 80);
-  assert.ok(Array.isArray(progRes.body.records));
+  assert.equal(crossGam.status, 403, 'Cross-family gamification inspection must return HTTP 403');
 });

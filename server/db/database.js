@@ -191,6 +191,19 @@ export function initDatabase() {
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (learner_id) REFERENCES learners(id) ON DELETE CASCADE
     );
+
+    -- Phase 3: Neurodiverse-Accessible Gamification (XP, Streaks & Mastery Badges)
+    CREATE TABLE IF NOT EXISTS learner_math_gamification (
+      learner_id TEXT PRIMARY KEY,
+      xp INTEGER DEFAULT 0,
+      current_streak INTEGER DEFAULT 1,
+      best_streak INTEGER DEFAULT 1,
+      last_practice_date TEXT,
+      badges_unlocked TEXT DEFAULT '[]',
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (learner_id) REFERENCES learners(id) ON DELETE CASCADE
+    );
   `;
 
   db.exec(schemaSQL);
