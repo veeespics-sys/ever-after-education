@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { APP_CONFIG } from '../config/appConfig';
+import { LessonPlayer } from './LessonPlayer';
 import { 
   BookOpen, Sparkles, Award, ArrowLeft, CheckCircle2, Play, 
-  HelpCircle, Lightbulb, Compass, Target, Clock, Shield, LogOut 
+  HelpCircle, Lightbulb, Compass, Target, Clock, Shield, LogOut,
+  Calculator, Check
 } from 'lucide-react';
 
 export function LearnerDashboard({ learner, onBackToParent }) {
@@ -13,15 +15,20 @@ export function LearnerDashboard({ learner, onBackToParent }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Fetch this specific learner's enrolled subjects
+  // Phase 3: Lesson Engine active mode
+  const [isLessonPlayerActive, setIsLessonPlayerActive] = useState(false);
+  const [lessonProgressSummary, setLessonProgressSummary] = useState(null);
+
+  // Fetch this specific learner's enrolled subjects and progress
   useEffect(() => {
     if (!learner) return;
 
-    const fetchLearnerSubjects = async () => {
+    const fetchLearnerData = async () => {
       try {
         setLoading(true);
         setError(null);
 
+        // Fetch subjects
         const res = await fetch(`/api/learners/${learner.id}/subjects`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
@@ -35,6 +42,19 @@ export function LearnerDashboard({ learner, onBackToParent }) {
         if (active.length > 0) {
           setSelectedSubject(active[0]);
         }
+
+        // Fetch Phase 3 lesson progress summary
+        try {
+          const progRes = await fetch(`/api/lessons/progress/${learner.id}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+          if (progRes.ok) {
+            const progData = await progRes.json();
+            setLessonProgressSummary(progData.summary);
+          }
+        } catch (progErr) {
+          console.warn('Could not fetch lesson progress:', progErr);
+        }
       } catch (err) {
         console.error('Fetch learner subjects error:', err);
         setError(err.message);
@@ -43,7 +63,7 @@ export function LearnerDashboard({ learner, onBackToParent }) {
       }
     };
 
-    fetchLearnerSubjects();
+    fetchLearnerData();
   }, [learner?.id, token]);
 
   const getAvatarIcon = (code) => {
@@ -59,6 +79,29 @@ export function LearnerDashboard({ learner, onBackToParent }) {
           Return to Parent Dashboard
         </button>
       </div>
+    );
+  }
+
+  // If Lesson Player is active, render full-screen interactive lesson view
+  if (isLessonPlayerActive) {
+    return (
+      <LessonPlayer
+        learner={learner}
+        initialGrade={learner.grade}
+        token={token}
+        onBack={() => {
+          setIsLessonPlayerActive(false);
+          // Refetch progress
+          if (learner.id) {
+            fetch(`/api/lessons/progress/${learner.id}`, {
+              headers: { 'Authorization': `Bearer ${token}` }
+            })
+              .then(r => r.json())
+              .then(d => { if (d.summary) setLessonProgressSummary(d.summary); })
+              .catch(() => {});
+          }
+        }}
+      />
     );
   }
 
@@ -114,13 +157,60 @@ export function LearnerDashboard({ learner, onBackToParent }) {
               </span>
             </div>
             <p style={{ color: '#E8DFD5', fontSize: '0.95rem', marginTop: '0.25rem' }}>
-              Ready for today's learning journey? Work at your own pace with helpful worked examples and hints.
+              Ready for today's learning journey? Work at your own pace with line-by-line equations and progressive hints.
             </p>
           </div>
         </div>
       </div>
 
-      {/* Encouragement / Growth Card (Individualized - NO public competition) */}
+      {/* Phase 3 High School Math Launch Banner */}
+      <div className="card" style={{ background: 'linear-gradient(90deg, #FFFFFF 0%, #FBF9F5 100%)', border: '2px solid var(--color-bronze-metallic)', marginBottom: '2rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1.25rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <div style={{ width: '48px', height: '48px', borderRadius: 'var(--radius-md)', background: 'var(--color-primary-100)', color: 'var(--color-primary-800)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Calculator size={26} />
+            </div>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <span className="verification-badge">Phase 3 Live</span>
+                <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--color-accent-700)', textTransform: 'uppercase' }}>
+                  CAPS Mathematics Engine
+                </span>
+              </div>
+              <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--color-primary-900)', marginTop: '0.15rem' }}>
+                High School Algebra Modules (Grades 8, 9 &amp; 10)
+              </h3>
+              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+                Solve equations step-by-step with real-time feedback, worked solutions, and 3 tiers of progressive hints.
+              </p>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            {lessonProgressSummary && lessonProgressSummary.totalCompleted > 0 && (
+              <div style={{ textAlign: 'right' }}>
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-subtle)', textTransform: 'uppercase' }}>
+                  Your Mastery
+                </div>
+                <div style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--color-primary-900)' }}>
+                  {lessonProgressSummary.masteredCount} Mastered • {lessonProgressSummary.averageScore}% Avg
+                </div>
+              </div>
+            )}
+            <button
+              id="launch-math-engine-btn"
+              className="btn btn-primary"
+              style={{ padding: '0.65rem 1.25rem', fontSize: '0.95rem' }}
+              onClick={() => setIsLessonPlayerActive(true)}
+            >
+              <Play size={16} />
+              <span>Launch Math Engine</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Encouragement / Growth Cards (Individualized - NO public competition) */}
       <div className="grid-3" style={{ marginBottom: '2rem' }}>
         <div className="card" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
           <div style={{ width: '42px', height: '42px', borderRadius: '50%', background: 'var(--color-accent-100)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-accent-700)' }}>
@@ -165,10 +255,10 @@ export function LearnerDashboard({ learner, onBackToParent }) {
               Support Available
             </div>
             <div style={{ fontWeight: 700, fontSize: '1.1rem', color: 'var(--color-primary-900)' }}>
-              Guided Hints
+              3-Tier Progressive Hints
             </div>
             <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-              Step-by-step assistance
+              Rules, steps &amp; solutions
             </div>
           </div>
         </div>
@@ -203,6 +293,8 @@ export function LearnerDashboard({ learner, onBackToParent }) {
         <div className="grid-2">
           {enrolledSubjects.map(sub => {
             const isSelected = selectedSubject?.id === sub.id;
+            const isMath = sub.title.toLowerCase().includes('math');
+
             return (
               <div
                 key={sub.id}
@@ -236,35 +328,41 @@ export function LearnerDashboard({ learner, onBackToParent }) {
                     Reference: {sub.caps_doc_ref || 'Official CAPS DBE syllabus'}
                   </span>
                   <span style={{ fontWeight: 600, color: 'var(--color-primary-700)' }}>
-                    Stage 1 Active
+                    {isMath ? 'Phase 3 Interactive' : 'Active Subject'}
                   </span>
                 </div>
 
-                <div style={{ marginTop: '1rem', display: 'flex', justifyContent: 'flex-end' }}>
-                  <button
-                    className="btn btn-sm btn-primary"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setSelectedSubject(sub);
-                    }}
-                  >
-                    <Play size={14} />
-                    <span>View Curriculum Outline</span>
-                  </button>
+                <div style={{ marginTop: '1rem', display: 'flex', justifyContent: 'flex-end', gap: '0.5rem' }}>
+                  {isMath ? (
+                    <button
+                      id={`practice-math-btn-${sub.subject_code}`}
+                      className="btn btn-sm btn-primary"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setIsLessonPlayerActive(true);
+                      }}
+                    >
+                      <Play size={14} />
+                      <span>Start CAPS Math Practice</span>
+                    </button>
+                  ) : (
+                    <button
+                      className="btn btn-sm btn-secondary"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedSubject(sub);
+                      }}
+                    >
+                      <BookOpen size={14} />
+                      <span>Curriculum Outline</span>
+                    </button>
+                  )}
                 </div>
               </div>
             );
           })}
         </div>
       )}
-
-      {/* Stage Roadmap Notice */}
-      <div className="notice-box notice-info" style={{ marginTop: '2.5rem' }}>
-        <Lightbulb size={20} color="var(--color-bronze-dark)" />
-        <div>
-          <strong>Upcoming Stage 3 Preview:</strong> In Stage 1, {APP_CONFIG.brandName} secures individual family workspaces and subject enrolments. In Stage 3, verified CAPS Mathematics lessons, worked examples, interactive practice questions, and hint progressions will be introduced directly inside each subject card!
-        </div>
-      </div>
     </div>
   );
 }

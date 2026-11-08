@@ -8,6 +8,7 @@ import learnerRoutes from './routes/learnerRoutes.js';
 import curriculumRoutes from './routes/curriculumRoutes.js';
 import familyRoutes from './routes/familyRoutes.js';
 import invitationRoutes from './routes/invitationRoutes.js';
+import lessonRoutes from './routes/lessonRoutes.js';
 import { initDatabase } from './db/database.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -27,6 +28,7 @@ app.use('/api/learners', learnerRoutes);
 app.use('/api/curriculum', curriculumRoutes);
 app.use('/api/family', familyRoutes);
 app.use('/api/invitations', invitationRoutes);
+app.use('/api/lessons', lessonRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

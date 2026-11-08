@@ -159,6 +159,38 @@ export function initDatabase() {
       FOREIGN KEY (learner_id) REFERENCES learners(id) ON DELETE CASCADE,
       FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
     );
+
+    -- Phase 3: Learner Lesson Progress & Mastery Tracking (High School Math Engine)
+    CREATE TABLE IF NOT EXISTS learner_lesson_progress (
+      id TEXT PRIMARY KEY,
+      learner_id TEXT NOT NULL,
+      family_id TEXT NOT NULL,
+      problem_id TEXT NOT NULL,
+      grade TEXT NOT NULL,
+      topic TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'completed' CHECK(status IN ('in_progress', 'completed', 'mastered')),
+      score INTEGER DEFAULT 100,
+      hints_used INTEGER DEFAULT 0,
+      attempts_count INTEGER DEFAULT 1,
+      completed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (learner_id) REFERENCES learners(id) ON DELETE CASCADE,
+      FOREIGN KEY (family_id) REFERENCES families(id) ON DELETE CASCADE,
+      UNIQUE(learner_id, problem_id)
+    );
+
+    -- Phase 3: Step-by-Step Submission Audit (Line-by-Line Math Progress)
+    CREATE TABLE IF NOT EXISTS learner_step_submissions (
+      id TEXT PRIMARY KEY,
+      learner_id TEXT NOT NULL,
+      problem_id TEXT NOT NULL,
+      step_number INTEGER NOT NULL,
+      learner_input TEXT NOT NULL,
+      is_correct INTEGER NOT NULL CHECK(is_correct IN (0, 1)),
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (learner_id) REFERENCES learners(id) ON DELETE CASCADE
+    );
   `;
 
   db.exec(schemaSQL);

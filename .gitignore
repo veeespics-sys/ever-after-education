@@ -3,7 +3,7 @@ node_modules/
 package-lock.json
 
 # Local databases and SQLite WAL/SHM files
-data/
+/data/
 *.db
 *.db-shm
 *.db-wal
