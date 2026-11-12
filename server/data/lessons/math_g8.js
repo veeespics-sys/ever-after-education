@@ -1,16 +1,13 @@
 /**
  * CAPS Senior Phase Mathematics — Grade 8
- * Module: Algebraic Expressions & Equations
- * 
- * Misconception-Driven Multiple-Choice Question (MCQ) Engine
- * Each distractor addresses typical South African CAPS algebraic errors:
- * - Distributive law neglect: 3(2x - 4) -> 6x - 4 (forgetting to multiply second term)
- * - Sign rules with negatives: (-3) * (-4) -> -12 instead of +12
- * - Adding coefficients instead of multiplying: 3 * 2x -> 5x
- * - Transposition sign errors: 4x + 12 = 28 -> 4x = 40 (adding instead of subtracting)
+ * Modules:
+ * 1. Algebraic Expressions & Equations
+ * 2. Euclidean Geometry (Straight Lines & Triangles)
+ * 3. Financial Mathematics (Simple Interest & Hire Purchase)
  */
 
 export const MATH_GRADE_8_PROBLEMS = [
+  // --- MODULE 1: ALGEBRAIC EXPRESSIONS & EQUATIONS ---
   {
     id: 'g8_alg_01',
     grade: 'Grade 8',
@@ -243,268 +240,473 @@ export const MATH_GRADE_8_PROBLEMS = [
       }
     ]
   },
+
+  // --- MODULE 2: EUCLIDEAN GEOMETRY (STRAIGHT LINES & TRIANGLES) ---
   {
-    id: 'g8_alg_03',
+    id: 'g8_geom_01',
     grade: 'Grade 8',
-    topic: 'Algebraic Expressions & Equations',
-    subtopic: 'Variables on Both Sides',
-    title: 'Isolating Variables on Both Sides',
-    questionText: 'Solve for x: 5x - 8 = 2x + 7',
-    latexExpression: '5x - 8 = 2x + 7',
-    capsRef: 'DBE CAPS Senior Phase (Grades 7-9) Mathematics, Section 3.3',
+    topic: 'Euclidean Geometry',
+    subtopic: 'Geometry of Straight Lines',
+    title: 'Supplementary Angles on a Straight Line',
+    questionText: 'Adjacent angles on a straight line AB are given as (3x + 10)° and (2x + 20)°. Set up the equation, solve for x, and state the formal CAPS geometric reason.',
+    latexExpression: '(3x + 10^\\circ) + (2x + 20^\\circ) = 180^\\circ \\quad [\\angle\\text{s on a straight line}]',
+    capsRef: 'DBE CAPS Senior Phase (Grades 7-9) Mathematics, Section 3.4',
     steps: [
       {
         stepNumber: 1,
-        prompt: 'Step 1: Subtract 2x from both sides so all variable terms are grouped on the left.',
-        expectedAnswer: '3x - 8 = 7',
+        prompt: 'Step 1: Set up the geometric equation for adjacent angles on straight line AB, stating the CAPS reason.',
+        expectedAnswer: '(3x + 10) + (2x + 20) = 180',
         options: [
           {
             id: 'opt_1a',
-            text: '3x - 8 = 7',
+            text: '(3x + 10) + (2x + 20) = 180  [∠s on a straight line]',
             isCorrect: true,
-            explanation: 'Correct! 5x - 2x = 3x, leaving 3x - 8 = 7.'
+            explanation: 'Correct! Angles lying adjacent on a continuous straight line sum to 180° (supplementary).'
           },
           {
             id: 'opt_1b',
-            text: '7x - 8 = 7',
+            text: '(3x + 10) + (2x + 20) = 90  [complementary ∠s]',
             isCorrect: false,
-            explanation: 'Addition Trap: To cancel +2x from the right side, you must subtract 2x from both sides (5x - 2x = 3x), not add (5x + 2x = 7x).'
+            explanation: 'Complementary Angle Trap: Complementary angles sum to 90° (a right angle), but angles on a straight line are supplementary and sum to 180°.'
           },
           {
             id: 'opt_1c',
-            text: '3x = 7',
+            text: '3x + 10 = 2x + 20  [vertically opposite ∠s]',
             isCorrect: false,
-            explanation: 'Term Omission: Do not forget the -8 on the left! It must remain: 3x - 8 = 7.'
+            explanation: 'Vertically Opposite Trap: Vertically opposite angles are across from each other at an intersection X, not adjacent along a single straight line.'
           },
           {
             id: 'opt_1d',
-            text: '3x - 8 = 2x',
+            text: '(3x + 10) + (2x + 20) = 360  [∠s around a point]',
             isCorrect: false,
-            explanation: 'Misplaced Terms: When subtracting 2x from both sides, the 2x on the right cancels, leaving +7.'
+            explanation: 'Revolution Trap: 360° is the sum of angles forming a full revolution around a point, not a straight line.'
           }
         ],
-        hint: '5x - 2x gives 3x.'
+        hint: 'Angles on a straight line add up to 180°.'
       },
       {
         stepNumber: 2,
-        prompt: 'Step 2: Add 8 to both sides to isolate 3x.',
-        expectedAnswer: '3x = 15',
+        prompt: 'Step 2: Collect like terms (3x + 2x and 10 + 20) and solve for x.',
+        expectedAnswer: 'x = 30',
         options: [
           {
             id: 'opt_2a',
-            text: '3x = 15',
+            text: 'x = 30',
             isCorrect: true,
-            explanation: 'Spot on! 7 + 8 = 15, so 3x = 15.'
+            explanation: 'Spot on! 5x + 30 = 180 => 5x = 150 => x = 150 / 5 = 30.'
           },
           {
             id: 'opt_2b',
-            text: '3x = -1',
+            text: 'x = 42',
             isCorrect: false,
-            explanation: 'Sign Reversal: To eliminate -8, you must ADD 8 to both sides: 7 + 8 = 15, not 7 - 8 = -1.'
+            explanation: 'Transposition Error: You added 30 to 180 (210 / 5 = 42). Remember to SUBTRACT 30 from 180: 180 - 30 = 150.'
           },
           {
             id: 'opt_2c',
-            text: '3x = 1',
+            text: 'x = 25',
             isCorrect: false,
-            explanation: 'Arithmetic Mistake: 7 + 8 = 15 (not 1).'
+            explanation: 'Arithmetic division error: 150 / 5 = 30, not 25.'
           },
           {
             id: 'opt_2d',
-            text: 'x = 15',
-            isCorrect: false,
-            explanation: 'Premature Result: The coefficient 3 is still multiplying x. You have 3x = 15.'
-          }
-        ],
-        hint: '7 + 8 = 15.'
-      },
-      {
-        stepNumber: 3,
-        prompt: 'Step 3: Divide both sides by 3 to find x.',
-        expectedAnswer: 'x = 5',
-        options: [
-          {
-            id: 'opt_3a',
-            text: 'x = 5',
-            isCorrect: true,
-            explanation: 'Awesome! 15 / 3 = 5. Solution complete!'
-          },
-          {
-            id: 'opt_3b',
             text: 'x = 12',
             isCorrect: false,
-            explanation: 'Inverse Operation Error: 3 is multiplied by x; divide 15 by 3, do not subtract 3.'
-          },
-          {
-            id: 'opt_3c',
-            text: 'x = 45',
-            isCorrect: false,
-            explanation: 'Multiplication Trap: You multiplied 15 * 3 instead of dividing 15 / 3.'
-          },
-          {
-            id: 'opt_3d',
-            text: 'x = 3',
-            isCorrect: false,
-            explanation: 'Arithmetic Mistake: 15 / 3 = 5, because 3 * 5 = 15.'
+            explanation: 'Used 90° instead of 180°: 90 - 30 = 60 / 5 = 12. Remember straight line angles sum to 180°.'
           }
         ],
-        hint: 'Divide 15 by 3.'
+        hint: '5x + 30 = 180 => 5x = 150 => x = 30.'
       }
     ],
     solution: [
-      '5x - 8 = 2x + 7',
-      '5x - 2x - 8 = 7',
-      '3x - 8 = 7',
-      '3x = 7 + 8',
-      '3x = 15',
-      'x = 5'
+      '(3x + 10°) + (2x + 20°) = 180°  [∠s on a straight line]',
+      '5x + 30° = 180°',
+      '5x = 180° - 30° = 150°',
+      'x = 150° / 5 = 30°',
+      'First angle: 3(30°) + 10° = 100°',
+      'Second angle: 2(30°) + 20° = 80°',
+      'Check: 100° + 80° = 180°'
     ],
     hints: [
       {
         tier: 1,
         type: 'Conceptual Rule',
-        text: 'Group like terms on opposite sides of the equals sign: move all variable terms (x) to one side and all constant numbers to the other side.'
+        text: 'Geometric Reason: Adjacent angles on a straight line are supplementary and always sum to 180°. DBE CAPS reason code: [∠s on a straight line].'
       },
       {
         tier: 2,
         type: 'Structural Hint',
-        text: 'Subtract 2x from 5x to leave 3x - 8 = 7. Next, add 8 to both sides to get 3x = 15. Then divide by 3.'
+        text: 'Write: (3x + 10) + (2x + 20) = 180. Combine terms: 5x + 30 = 180. Subtract 30, then divide by 5.'
       },
       {
         tier: 3,
         type: 'Complete Worked Solution',
-        text: '1) 5x - 2x - 8 = 7 => 3x - 8 = 7\n2) 3x = 7 + 8 => 3x = 15\n3) x = 15 / 3 => x = 5'
+        text: '1) 5x + 30° = 180° [∠s on straight line]\n2) 5x = 150°\n3) x = 30°'
       }
     ]
   },
   {
-    id: 'g8_alg_04',
+    id: 'g8_geom_02',
     grade: 'Grade 8',
-    topic: 'Algebraic Expressions & Equations',
-    subtopic: 'Algebraic Substitution',
-    title: 'Evaluating Quadratic Expressions with Negative Values',
-    questionText: 'If x = -3, evaluate the numerical value of: 2x^2 - 4x + 5',
-    latexExpression: '2x^2 - 4x + 5 \\quad (\\text{for } x = -3)',
-    capsRef: 'DBE CAPS Senior Phase (Grades 7-9) Mathematics, Section 3.2',
+    topic: 'Euclidean Geometry',
+    subtopic: 'Triangle Angle Sum & Exterior Angles',
+    title: 'Interior Angle Sum of a Triangle',
+    questionText: 'In triangle ABC, angle A = 55° and angle B = 65°. Calculate the size of interior angle C, stating the required CAPS geometric reason.',
+    latexExpression: '\\angle A + \\angle B + \\angle C = 180^\\circ \\quad [\\text{sum of } \\angle\\text{s in } \\triangle]',
+    capsRef: 'DBE CAPS Senior Phase (Grades 7-9) Mathematics, Section 3.4',
     steps: [
       {
         stepNumber: 1,
-        prompt: 'Step 1: Substitute x = -3 into the expression using parentheses.',
-        expectedAnswer: '2(-3)^2 - 4(-3) + 5',
+        prompt: 'Step 1: Set up the interior angle sum equation for triangle ABC with the formal geometric reason.',
+        expectedAnswer: '55 + 65 + C = 180',
         options: [
           {
             id: 'opt_1a',
-            text: '2(-3)^2 - 4(-3) + 5',
+            text: '55° + 65° + ∠C = 180°  [sum of ∠s in Δ]',
             isCorrect: true,
-            explanation: 'Correct! Always wrap substituted negative values in parentheses to preserve signs.'
+            explanation: 'Correct! The sum of the interior angles of any triangle is always 180°.'
           },
           {
             id: 'opt_1b',
-            text: '2 - 3^2 - 4 - 3 + 5',
+            text: '55° + 65° + ∠C = 360°  [sum of ∠s in quad]',
             isCorrect: false,
-            explanation: 'Missing Multiplication Trap: 2x^2 means 2 TIMES x^2. Without parentheses, 2(-3)^2 looks like 2 minus 3^2.'
+            explanation: 'Quadrilateral Trap: 360° is the sum of angles in a 4-sided polygon (quadrilateral), not a triangle.'
           },
           {
             id: 'opt_1c',
-            text: '2(3)^2 - 4(3) + 5',
+            text: '∠C = 55° + 65°  [exterior ∠ of Δ]',
             isCorrect: false,
-            explanation: 'Dropped Negative Sign: The given value is x = -3, not positive 3!'
+            explanation: 'Exterior Angle Confusion: The exterior angle equals the sum of two opposite interior angles, but ∠C is an INTERIOR angle of the triangle.'
           },
           {
             id: 'opt_1d',
-            text: '2(-3)^2 + 4(-3) + 5',
+            text: '55° + 65° + ∠C = 90°  [complementary ∠s]',
             isCorrect: false,
-            explanation: 'Altered Operator: The original middle term is -4x, so it is -4(-3).'
+            explanation: 'Right Angle Trap: Triangles have an angle sum of 180°, never 90°.'
           }
         ],
-        hint: 'Write: 2(-3)^2 - 4(-3) + 5.'
+        hint: 'The three interior angles of a triangle add up to 180°.'
       },
       {
         stepNumber: 2,
-        prompt: 'Step 2: Calculate (-3)^2 = 9 and -4 * (-3) = +12 according to order of operations.',
-        expectedAnswer: '18 + 12 + 5',
+        prompt: 'Step 2: Add the known angles (55° + 65°) and subtract from 180° to find ∠C.',
+        expectedAnswer: '∠C = 60°',
         options: [
           {
             id: 'opt_2a',
-            text: '18 + 12 + 5',
+            text: '∠C = 60°',
             isCorrect: true,
-            explanation: 'Great! 2 * 9 = 18 and (-4) * (-3) = +12. Both terms become positive.'
+            explanation: 'Excellent! 55° + 65° = 120°. Then 180° - 120° = 60°.'
           },
           {
             id: 'opt_2b',
-            text: '-18 - 12 + 5',
+            text: '∠C = 70°',
             isCorrect: false,
-            explanation: 'Negative Squaring Trap: (-3)^2 is (-3)*(-3) = +9 (positive!). Multiplied by 2, it gives +18, not -18.'
+            explanation: 'Addition Error: 55 + 65 = 120 (not 110). 180 - 120 = 60°.'
           },
           {
             id: 'opt_2c',
-            text: '18 - 12 + 5',
+            text: '∠C = 120°',
             isCorrect: false,
-            explanation: 'Double Negative Trap: -4 * (-3) is a negative times a negative, which produces POSITIVE 12 (+12).'
+            explanation: 'Incomplete Calculation: 120° is the sum of angles A and B; you must subtract this sum from 180°.'
           },
           {
             id: 'opt_2d',
-            text: '36 + 12 + 5',
+            text: '∠C = 50°',
             isCorrect: false,
-            explanation: 'Order of Operations Trap: You multiplied 2 * (-3) first to get -6, and then squared it to 36. Under BODMAS, evaluate the exponent FIRST: (-3)^2 = 9, then 2 * 9 = 18.'
+            explanation: 'Subtraction Error: 180 - 120 = 60°, not 50°.'
           }
         ],
-        hint: '(-3)^2 is +9. 2 * 9 = 18. -4 * (-3) = +12.'
-      },
-      {
-        stepNumber: 3,
-        prompt: 'Step 3: Add the terms to find the final numerical value.',
-        expectedAnswer: '35',
-        options: [
-          {
-            id: 'opt_3a',
-            text: '35',
-            isCorrect: true,
-            explanation: 'Brilliant! 18 + 12 + 5 = 35. Complete evaluation verified.'
-          },
-          {
-            id: 'opt_3b',
-            text: '11',
-            isCorrect: false,
-            explanation: 'Sign Arithmetic Trap: If you subtracted 12 (18 - 12 + 5), you get 11. But remember the middle term is +12: 18 + 12 = 30, and 30 + 5 = 35.'
-          },
-          {
-            id: 'opt_3c',
-            text: '25',
-            isCorrect: false,
-            explanation: 'Addition Mistake: 18 + 12 = 30. Then 30 + 5 = 35, not 25.'
-          },
-          {
-            id: 'opt_3d',
-            text: '-25',
-            isCorrect: false,
-            explanation: 'Negative Sign Error: All three numbers (18, 12, 5) are positive; their sum must be positive 35.'
-          }
-        ],
-        hint: '18 + 12 + 5 = 35.'
+        hint: '180° - (55° + 65°) = 180° - 120° = 60°.'
       }
     ],
     solution: [
-      '2x^2 - 4x + 5 (when x = -3)',
-      '= 2(-3)^2 - 4(-3) + 5',
-      '= 2(9) + 12 + 5',
-      '= 18 + 12 + 5',
-      '= 35'
+      '∠A + ∠B + ∠C = 180°  [sum of ∠s in Δ]',
+      '55° + 65° + ∠C = 180°',
+      '120° + ∠C = 180°',
+      '∠C = 180° - 120° = 60°'
     ],
     hints: [
       {
         tier: 1,
         type: 'Conceptual Rule',
-        text: 'When substituting negative numbers, always place parentheses around the value: (-3)^2 = +9, because a negative number multiplied by a negative number is positive.'
+        text: 'The sum of the three interior angles of any Euclidean triangle is always 180°. CAPS Reason: [sum of ∠s in Δ].'
       },
       {
         tier: 2,
         type: 'Structural Hint',
-        text: 'Follow BODMAS: First square -3 to get 9: 2(9) = 18. Next calculate -4 * (-3) = +12. Then calculate 18 + 12 + 5.'
+        text: 'First add 55° and 65° to get 120°. Then find what is needed to reach 180°.'
       },
       {
         tier: 3,
         type: 'Complete Worked Solution',
-        text: '1) Substitute: 2(-3)^2 - 4(-3) + 5\n2) Square (-3): 2(9) + 12 + 5\n3) Multiply: 18 + 12 + 5\n4) Sum: 35'
+        text: '∠C = 180° - 120° = 60° [sum of ∠s in Δ]'
+      }
+    ]
+  },
+
+  // --- MODULE 3: FINANCIAL MATHEMATICS (SIMPLE INTEREST & HIRE PURCHASE) ---
+  {
+    id: 'g8_fin_01',
+    grade: 'Grade 8',
+    topic: 'Financial Mathematics',
+    subtopic: 'Simple Interest Calculations',
+    title: 'Calculating Accumulated Amount with Simple Interest',
+    questionText: 'Thabo deposits R4 000 into a fixed deposit account at a simple interest rate of 7.5% per annum for 3 years. Calculate the total accumulated amount (A) at the end of the term.',
+    latexExpression: 'A = P(1 + i \\cdot n) \\quad \\text{where } P = \\text{R}4\\,000,\\; i = 0.075,\\; n = 3',
+    capsRef: 'DBE CAPS Senior Phase (Grades 7-9) Mathematics, Section 3.5',
+    steps: [
+      {
+        stepNumber: 1,
+        prompt: 'Step 1: Identify the interest rate in decimal form (i = r / 100) and choose the correct formula.',
+        expectedAnswer: 'i = 0.075 and A = P(1 + in)',
+        options: [
+          {
+            id: 'opt_1a',
+            text: 'i = 0.075 and A = P(1 + in)',
+            isCorrect: true,
+            explanation: 'Correct! Percent means per hundred: 7.5 / 100 = 0.075.'
+          },
+          {
+            id: 'opt_1b',
+            text: 'i = 7.5 and A = P(1 + in)',
+            isCorrect: false,
+            explanation: 'Percentage Conversion Trap: You must divide the percentage rate by 100 before using it in formulas! Using 7.5 will yield an interest of 750%!'
+          },
+          {
+            id: 'opt_1c',
+            text: 'i = 0.75 and A = P(1 + in)',
+            isCorrect: false,
+            explanation: 'Decimal Shift Trap: 7.5% is 7.5 / 100 = 0.075, not 0.75 (which would be 75%).'
+          },
+          {
+            id: 'opt_1d',
+            text: 'i = 0.075 and A = P(1 + i)^n',
+            isCorrect: false,
+            explanation: 'Formula Confusion: A = P(1 + i)^n is for COMPOUND interest (Grade 9+). The problem specifies SIMPLE interest: A = P(1 + in).'
+          }
+        ],
+        hint: 'i = 7.5 / 100 = 0.075.'
+      },
+      {
+        stepNumber: 2,
+        prompt: 'Step 2: Calculate the simple interest earned (I = P * i * n).',
+        expectedAnswer: 'I = R900',
+        options: [
+          {
+            id: 'opt_2a',
+            text: 'I = R900',
+            isCorrect: true,
+            explanation: 'Spot on! I = 4 000 * 0.075 * 3 = 4 000 * 0.225 = R900 interest earned.'
+          },
+          {
+            id: 'opt_2b',
+            text: 'I = R300',
+            isCorrect: false,
+            explanation: 'Single Year Trap: R300 is the interest for only 1 year (4 000 * 0.075). You must multiply by 3 years: 300 * 3 = R900.'
+          },
+          {
+            id: 'opt_2c',
+            text: 'I = R9 000',
+            isCorrect: false,
+            explanation: 'Decimal Error: Did you use 0.75 instead of 0.075? 4 000 * 0.075 * 3 = R900.'
+          },
+          {
+            id: 'opt_2d',
+            text: 'I = R90 000',
+            isCorrect: false,
+            explanation: 'Used un-converted rate 7.5: 4 000 * 7.5 * 3 = R90 000. Always divide by 100 first!'
+          }
+        ],
+        hint: 'I = 4 000 * 0.075 * 3 = R900.'
+      },
+      {
+        stepNumber: 3,
+        prompt: 'Step 3: Calculate the total accumulated final amount (A = P + I).',
+        expectedAnswer: 'A = R4 900',
+        options: [
+          {
+            id: 'opt_3a',
+            text: 'A = R4 900',
+            isCorrect: true,
+            explanation: 'Excellent! Total accumulated amount = Principal + Interest = R4 000 + R900 = R4 900.'
+          },
+          {
+            id: 'opt_3b',
+            text: 'A = R900',
+            isCorrect: false,
+            explanation: 'Interest Only: R900 is just the interest earned. The accumulated amount includes the original R4 000 investment!'
+          },
+          {
+            id: 'opt_3c',
+            text: 'A = R4 300',
+            isCorrect: false,
+            explanation: 'Added only 1 year of interest: R4 000 + R300 = R4 300. The term was 3 years (R900 interest).'
+          },
+          {
+            id: 'opt_3d',
+            text: 'A = R13 000',
+            isCorrect: false,
+            explanation: 'Calculation Error: R4 000 + R900 = R4 900.'
+          }
+        ],
+        hint: 'A = 4 000 + 900 = R4 900.'
+      }
+    ],
+    solution: [
+      'P = R4 000, i = 7.5% = 0.075, n = 3 years',
+      'Simple Interest: I = P * i * n',
+      'I = 4 000 * 0.075 * 3 = R900',
+      'Total Amount: A = P + I = 4 000 + 900 = R4 900'
+    ],
+    hints: [
+      {
+        tier: 1,
+        type: 'Conceptual Rule',
+        text: 'Simple interest is calculated solely on the original principal amount P: I = P * i * n, and Accumulated Amount A = P + I.'
+      },
+      {
+        tier: 2,
+        type: 'Structural Hint',
+        text: 'First calculate 7.5% of R4 000 to find 1 year interest (R300). Multiply by 3 years to get R900. Add to R4 000.'
+      },
+      {
+        tier: 3,
+        type: 'Complete Worked Solution',
+        text: '1) i = 0.075\n2) I = 4 000 * 0.075 * 3 = R900\n3) A = 4 000 + 900 = R4 900'
+      }
+    ]
+  },
+  {
+    id: 'g8_fin_02',
+    grade: 'Grade 8',
+    topic: 'Financial Mathematics',
+    subtopic: 'Hire Purchase Calculations',
+    title: 'Hire Purchase Deposit and Monthly Instalments',
+    questionText: 'A homeschool workstation costs R12 000 cash. Under hire purchase, the buyer pays a 15% cash deposit, and finances the remaining balance with 10% per annum simple interest over 2 years. Calculate the monthly instalment.',
+    latexExpression: '\\text{Balance} = \\text{Cash Price} - \\text{Deposit},\\; A = \\text{Balance}(1 + i \\cdot n)',
+    capsRef: 'DBE CAPS Senior Phase (Grades 7-9) Mathematics, Section 3.5',
+    steps: [
+      {
+        stepNumber: 1,
+        prompt: 'Step 1: Calculate the 15% deposit and the remaining balance owed.',
+        expectedAnswer: 'Deposit = R1 800, Balance = R10 200',
+        options: [
+          {
+            id: 'opt_1a',
+            text: 'Deposit = R1 800, Balance = R10 200',
+            isCorrect: true,
+            explanation: 'Correct! 15% of R12 000 = 0.15 * 12 000 = R1 800. Remaining balance = 12 000 - 1 800 = R10 200.'
+          },
+          {
+            id: 'opt_1b',
+            text: 'Deposit = R1 200, Balance = R10 800',
+            isCorrect: false,
+            explanation: '10% vs 15% Error: R1 200 is 10% of R12 000, but the deposit is 15% (1.5 * 1 200 = R1 800).'
+          },
+          {
+            id: 'opt_1c',
+            text: 'Deposit = R1 800, Balance = R12 000',
+            isCorrect: false,
+            explanation: 'Deposit Deduction Omission: You must subtract the deposit from the cash price before calculating interest!'
+          },
+          {
+            id: 'opt_1d',
+            text: 'Deposit = R1 500, Balance = R10 500',
+            isCorrect: false,
+            explanation: 'Percentage Error: 15% of 12 000 is 1 800, not 1 500.'
+          }
+        ],
+        hint: 'Deposit = 0.15 * 12 000 = R1 800. Balance = 12 000 - 1 800 = R10 200.'
+      },
+      {
+        stepNumber: 2,
+        prompt: 'Step 2: Calculate the total repayable amount A on the balance R10 200 at 10% simple interest over 2 years.',
+        expectedAnswer: 'A = R12 240',
+        options: [
+          {
+            id: 'opt_2a',
+            text: 'A = R12 240',
+            isCorrect: true,
+            explanation: 'Spot on! Interest = 10 200 * 0.10 * 2 = R2 040. Total repayable = 10 200 + 2 040 = R12 240.'
+          },
+          {
+            id: 'opt_2b',
+            text: 'A = R14 400',
+            isCorrect: false,
+            explanation: 'Interest on Full Price Trap: You calculated interest on the full R12 000 (12 000 * 1.2 = 14 400). In hire purchase, interest is charged ONLY on the remaining balance after deposit (R10 200)!'
+          },
+          {
+            id: 'opt_2c',
+            text: 'A = R11 220',
+            isCorrect: false,
+            explanation: 'One Year Trap: 10 200 * 0.10 = R1 020 is only 1 year of interest. The agreement is for 2 years (R2 040 interest).'
+          },
+          {
+            id: 'opt_2d',
+            text: 'A = R2 040',
+            isCorrect: false,
+            explanation: 'Interest Only: R2 040 is only the interest. The total repayable amount is Balance + Interest = R12 240.'
+          }
+        ],
+        hint: 'A = 10 200 * (1 + 0.10 * 2) = 10 200 * 1.20 = R12 240.'
+      },
+      {
+        stepNumber: 3,
+        prompt: 'Step 3: Calculate the monthly instalment over 2 years (24 months).',
+        expectedAnswer: 'R510 per month',
+        options: [
+          {
+            id: 'opt_3a',
+            text: 'R510 per month',
+            isCorrect: true,
+            explanation: 'Brilliant! 2 years = 24 months. Total R12 240 / 24 months = R510 per month.'
+          },
+          {
+            id: 'opt_3b',
+            text: 'R6 120 per month',
+            isCorrect: false,
+            explanation: 'Annual vs Monthly Trap: You divided by 2 (years) instead of 24 (months)! The question asks for the monthly instalment.'
+          },
+          {
+            id: 'opt_3c',
+            text: 'R1 020 per month',
+            isCorrect: false,
+            explanation: 'Divided by 12 months: 2 years contains 24 months, so divide by 24, not 12.'
+          },
+          {
+            id: 'opt_3d',
+            text: 'R600 per month',
+            isCorrect: false,
+            explanation: 'Used Full Price: 14 400 / 24 = 600. Remember interest was on R10 200 balance, giving R510.'
+          }
+        ],
+        hint: 'Divide total R12 240 by 24 months = R510/month.'
+      }
+    ],
+    solution: [
+      'Cash price = R12 000',
+      'Deposit = 15% of R12 000 = R1 800',
+      'Loan balance = R12 000 - R1 800 = R10 200',
+      'Simple Interest = R10 200 * 0.10 * 2 = R2 040',
+      'Total repayable = R10 200 + R2 040 = R12 240',
+      'Number of monthly instalments = 2 * 12 = 24 months',
+      'Monthly instalment = R12 240 / 24 = R510 per month'
+    ],
+    hints: [
+      {
+        tier: 1,
+        type: 'Conceptual Rule',
+        text: 'Hire Purchase Steps: 1) Calculate deposit. 2) Subtract deposit from cash price to get balance. 3) Apply simple interest to balance. 4) Divide total by number of months.'
+      },
+      {
+        tier: 2,
+        type: 'Structural Hint',
+        text: 'Deposit is R1 800, leaving R10 200. At 10% for 2 years, total is R10 200 * 1.20 = R12 240. Divide R12 240 by 24 months.'
+      },
+      {
+        tier: 3,
+        type: 'Complete Worked Solution',
+        text: '1) Balance = R10 200\n2) Total = R10 200 * 1.20 = R12 240\n3) Monthly = R12 240 / 24 = R510'
       }
     ]
   }

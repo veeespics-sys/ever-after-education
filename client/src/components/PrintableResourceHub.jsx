@@ -393,3 +393,4 @@ export function PrintableResourceHub({ grade = 'Grade 8', token, onBack }) {
     </div>
   );
 }
+

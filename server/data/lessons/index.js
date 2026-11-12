@@ -3,17 +3,29 @@ import { MATH_GRADE_9_PROBLEMS } from './math_g9.js';
 import { MATH_GRADE_10_PROBLEMS } from './math_g10.js';
 import { matchesAnswer, normalizeMathString } from './normalizer.js';
 
-export const ALL_LESSON_PROBLEMS = [
+const CURATED_LESSON_LIMIT = 4;
+
+function limitGradeProblems(problems) {
+  return problems.slice(0, CURATED_LESSON_LIMIT);
+}
+
+export const FULL_LESSON_PROBLEMS = [
   ...MATH_GRADE_8_PROBLEMS,
   ...MATH_GRADE_9_PROBLEMS,
   ...MATH_GRADE_10_PROBLEMS
+];
+
+export const ALL_LESSON_PROBLEMS = [
+  ...limitGradeProblems(MATH_GRADE_8_PROBLEMS),
+  ...limitGradeProblems(MATH_GRADE_9_PROBLEMS),
+  ...limitGradeProblems(MATH_GRADE_10_PROBLEMS)
 ];
 
 /**
  * Returns all lesson problems.
  */
 export function getAllLessons() {
-  return ALL_LESSON_PROBLEMS;
+  return [...ALL_LESSON_PROBLEMS];
 }
 
 /**
@@ -21,7 +33,7 @@ export function getAllLessons() {
  * @param {string} grade e.g. 'Grade 8', 'Grade 9', 'Grade 10'
  */
 export function getLessonsByGrade(grade) {
-  if (!grade) return ALL_LESSON_PROBLEMS;
+  if (!grade) return [...ALL_LESSON_PROBLEMS];
   const normalized = grade.toLowerCase().replace(/grade\s*/, '').trim();
   return ALL_LESSON_PROBLEMS.filter(p => {
     const pGrade = p.grade.toLowerCase().replace(/grade\s*/, '').trim();
@@ -34,7 +46,7 @@ export function getLessonsByGrade(grade) {
  * @param {string} problemId
  */
 export function getLessonById(problemId) {
-  return ALL_LESSON_PROBLEMS.find(p => p.id === problemId) || null;
+  return FULL_LESSON_PROBLEMS.find(p => p.id === problemId) || null;
 }
 
 /**
