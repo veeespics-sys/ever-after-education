@@ -2,23 +2,23 @@ import React from 'react';
 import { useAuth } from '../context/AuthContext';
 import { APP_CONFIG } from '../config/appConfig';
 import { BrandLogo } from './BrandLogo';
-import { Shield, BookOpen, User, LogOut, Users, Key } from 'lucide-react';
+import { Shield, BookOpen, User, LogOut, Users, Key, GraduationCap } from 'lucide-react';
 
 export function Navbar({ onOpenAuthModal, isLearnerMode, onToggleMode, learners = [] }) {
   const { user, family, activeLearner, setActiveLearner, logout, switchDemoFamily } = useAuth();
 
   return (
-    <header>
+    <header style={{ position: 'sticky', top: 0, zIndex: 100 }}>
       {/* Pilot Demo / Testing Bar */}
       {user?.role === 'learner' ? (
-        <div className="demo-banner" style={{ background: '#1c382b' }}>
+        <div className="demo-banner" style={{ background: '#064E3B' }}>
           <div className="demo-banner-group">
-            <span className="demo-badge" style={{ background: 'var(--color-bronze-metallic)' }}>LEARNER MODE</span>
+            <span className="demo-badge" style={{ background: '#059669' }}>LEARNER ACTIVE</span>
             <span style={{ fontSize: '0.85rem' }}>Active Profile: <strong>{user.display_name}</strong></span>
           </div>
           <div className="demo-banner-group">
             <span style={{ fontSize: '0.8rem', opacity: 0.9 }}>
-              Family: <strong style={{ color: '#F6ECE2' }}>{family ? family.name : 'Enrolled Family'}</strong>
+              Family: <strong>{family ? family.name : 'Enrolled Family'}</strong>
             </span>
           </div>
         </div>
@@ -26,7 +26,7 @@ export function Navbar({ onOpenAuthModal, isLearnerMode, onToggleMode, learners 
         <div className="demo-banner">
           <div className="demo-banner-group">
             <span className="demo-badge">PILOT TEST HELPER</span>
-            <span style={{ opacity: 0.9 }}>Switch Family Workspace:</span>
+            <span style={{ opacity: 0.85, fontSize: '0.775rem' }}>Switch Family Workspace:</span>
             {APP_CONFIG.demoAccounts.map(acc => (
               <button
                 key={acc.key}
@@ -35,15 +35,15 @@ export function Navbar({ onOpenAuthModal, isLearnerMode, onToggleMode, learners 
                 onClick={() => switchDemoFamily(acc.key)}
                 title={`Switch to ${acc.familyName} (${acc.learnersSummary})`}
               >
-                <Users size={13} />
+                <Users size={12} />
                 <span>{acc.familyName}</span>
               </button>
             ))}
           </div>
 
           <div className="demo-banner-group">
-            <span style={{ fontSize: '0.8rem', opacity: 0.9 }}>
-              Active: <strong style={{ color: '#F6ECE2' }}>{family ? family.name : 'Not Signed In'}</strong>
+            <span style={{ fontSize: '0.775rem', opacity: 0.85 }}>
+              Active: <strong style={{ color: '#FCD34D' }}>{family ? family.name : 'Not Signed In'}</strong>
             </span>
           </div>
         </div>
@@ -60,8 +60,8 @@ export function Navbar({ onOpenAuthModal, isLearnerMode, onToggleMode, learners 
               title={`${APP_CONFIG.brandName} - Return to Overview`}
             >
               <BrandLogo variant="full" size="md" />
-              <span className="brand-badge" style={{ marginLeft: '0.75rem' }}>
-                CAPS Aligned
+              <span className="brand-badge">
+                DBE CAPS Verified
               </span>
             </a>
           </div>
@@ -69,14 +69,14 @@ export function Navbar({ onOpenAuthModal, isLearnerMode, onToggleMode, learners 
           <div className="nav-actions">
             {user ? (
               <>
-                {/* View Switcher: Parent vs Learner (Only for parents/tutors) */}
+                {/* View Switcher: Parent vs Learner */}
                 {user.role !== 'learner' && (
                   <div style={{ display: 'flex', background: 'var(--bg-surface-alt)', padding: '0.2rem', borderRadius: 'var(--radius-md)' }}>
                     <button
                       id="nav-parent-mode-btn"
                       className={`btn btn-sm ${!isLearnerMode ? 'btn-primary' : 'btn-ghost'}`}
                       onClick={() => onToggleMode(false)}
-                      style={{ fontSize: '0.8rem' }}
+                      style={{ fontSize: '0.8rem', padding: '0.35rem 0.75rem' }}
                     >
                       <Shield size={14} />
                       <span>Parent / Tutor</span>
@@ -91,22 +91,22 @@ export function Navbar({ onOpenAuthModal, isLearnerMode, onToggleMode, learners 
                         }
                         onToggleMode(true);
                       }}
-                      style={{ fontSize: '0.8rem' }}
+                      style={{ fontSize: '0.8rem', padding: '0.35rem 0.75rem' }}
                       disabled={learners.length === 0}
-                      title={learners.length === 0 ? 'Add a learner first to preview learner view' : 'Switch to Learner View'}
+                      title={learners.length === 0 ? 'Add a learner first' : 'Switch to Learner View'}
                     >
-                      <BookOpen size={14} />
+                      <GraduationCap size={14} />
                       <span>Learner View</span>
                     </button>
                   </div>
                 )}
 
-                {/* If in learner mode and multiple learners, quick switch */}
+                {/* If multiple learners in learner mode, selector */}
                 {isLearnerMode && learners.length > 1 && (
                   <select
                     id="nav-learner-select"
                     className="form-select"
-                    style={{ width: 'auto', padding: '0.35rem 0.65rem', fontSize: '0.85rem' }}
+                    style={{ width: 'auto', padding: '0.35rem 0.65rem', fontSize: '0.825rem' }}
                     value={activeLearner?.id || ''}
                     onChange={(e) => {
                       const selected = learners.find(l => l.id === e.target.value);
@@ -121,12 +121,12 @@ export function Navbar({ onOpenAuthModal, isLearnerMode, onToggleMode, learners 
                   </select>
                 )}
 
-                {/* User / Family Pill */}
+                {/* User Info Pill */}
                 <div className="user-pill">
-                  <User size={14} color="var(--color-bronze-dark)" />
+                  <User size={13} color="var(--color-primary-600)" />
                   <span style={{ fontWeight: 600 }}>{user.display_name}</span>
                   <span className={`role-tag ${isLearnerMode ? 'learner' : ''}`}>
-                    {isLearnerMode ? 'Learner Mode' : user.role}
+                    {isLearnerMode ? 'Learner' : user.role}
                   </span>
                 </div>
 
@@ -137,7 +137,7 @@ export function Navbar({ onOpenAuthModal, isLearnerMode, onToggleMode, learners 
                   onClick={logout}
                   title="Sign out of platform"
                 >
-                  <LogOut size={16} />
+                  <LogOut size={15} />
                   <span>Sign Out</span>
                 </button>
               </>
@@ -147,7 +147,7 @@ export function Navbar({ onOpenAuthModal, isLearnerMode, onToggleMode, learners 
                 className="btn btn-primary btn-sm"
                 onClick={onOpenAuthModal}
               >
-                <Key size={15} />
+                <Key size={14} />
                 <span>Sign In / Register</span>
               </button>
             )}

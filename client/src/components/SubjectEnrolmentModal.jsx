@@ -13,7 +13,6 @@ export function SubjectEnrolmentModal({ isOpen, onClose, learner, token, onEnrol
   const [showHistory, setShowHistory] = useState(false);
   const [historyList, setHistoryList] = useState([]);
 
-  // Fetch subjects available for this grade and current learner enrolments
   const loadData = async () => {
     try {
       setLoading(true);
@@ -32,13 +31,11 @@ export function SubjectEnrolmentModal({ isOpen, onClose, learner, token, onEnrol
       setAvailableSubjects(data.availableForGrade || []);
       setEnrolments(data.enrolments || []);
 
-      // Pre-select actively enrolled subjects
       const activeCodes = new Set(
         (data.enrolments || []).filter(e => e.status === 'active').map(e => e.subject_code)
       );
       setSelectedCodes(activeCodes);
 
-      // Load learner full details for audit history
       const learnerRes = await fetch(`/api/learners/${learner.id}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -79,13 +76,9 @@ export function SubjectEnrolmentModal({ isOpen, onClose, learner, token, onEnrol
         enrolments.filter(e => e.status === 'active').map(e => e.subject_code)
       );
 
-      // Codes to enrol (selected now, not active before)
       const toEnrol = Array.from(selectedCodes).filter(c => !currentActiveCodes.has(c));
-
-      // Codes to de-activate (active before, not selected now)
       const toDeactivate = Array.from(currentActiveCodes).filter(c => !selectedCodes.has(c));
 
-      // 1. Enrol new selections
       if (toEnrol.length > 0) {
         const enrolRes = await fetch(`/api/learners/${learner.id}/subjects`, {
           method: 'POST',
@@ -101,7 +94,6 @@ export function SubjectEnrolmentModal({ isOpen, onClose, learner, token, onEnrol
         }
       }
 
-      // 2. De-activate unselected subjects with historical preservation
       for (const code of toDeactivate) {
         const deactRes = await fetch(`/api/learners/${learner.id}/subjects/${code}`, {
           method: 'PUT',
@@ -135,12 +127,14 @@ export function SubjectEnrolmentModal({ isOpen, onClose, learner, token, onEnrol
       <div className="modal-dialog" style={{ maxWidth: '680px' }} onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
-            <BookCheck size={22} color="var(--color-bronze-dark)" />
+            <div style={{ width: '38px', height: '38px', borderRadius: 'var(--radius-md)', background: '#ECFDF5', color: '#059669', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <BookCheck size={20} />
+            </div>
             <div>
-              <h3 className="modal-title font-display">
+              <h3 className="modal-title" style={{ margin: 0, fontSize: '1.25rem' }}>
                 Subject Enrolment: {learner.first_name}
               </h3>
-              <div style={{ fontSize: '0.8rem', color: 'var(--text-subtle)' }}>
+              <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
                 {learner.grade} • South African CAPS Curriculum Offerings
               </div>
             </div>
@@ -158,16 +152,15 @@ export function SubjectEnrolmentModal({ isOpen, onClose, learner, token, onEnrol
             </div>
           )}
 
-          {/* Education Guarantee Notice */}
-          <div className="notice-box notice-info" style={{ margin: 0, padding: '0.75rem 1rem' }}>
+          <div className="notice-box notice-privacy" style={{ margin: 0, padding: '0.75rem 1rem' }}>
             <Sparkles size={16} />
             <div style={{ fontSize: '0.825rem' }}>
               <strong>Zero Data Loss Policy:</strong> Parents choose which subjects each learner studies. Unchecking a subject archives it without erasing previous lesson completions, scores, or history.
             </div>
           </div>
 
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--color-primary-900)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.5rem' }}>
+            <span style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-main)' }}>
               Select Enrolled Subjects ({selectedCodes.size} active)
             </span>
             <button
@@ -177,22 +170,22 @@ export function SubjectEnrolmentModal({ isOpen, onClose, learner, token, onEnrol
               style={{ fontSize: '0.775rem' }}
             >
               <History size={13} />
-              <span>{showHistory ? 'Hide Audit Trail' : 'View Enrolment History'}</span>
+              <span>{showHistory ? 'Hide History' : 'View Audit History'}</span>
             </button>
           </div>
 
           {showHistory && (
-            <div style={{ background: 'var(--bg-surface-alt)', padding: '0.85rem', borderRadius: 'var(--radius-md)', fontSize: '0.8rem' }}>
-              <div style={{ fontWeight: 600, marginBottom: '0.5rem', color: 'var(--color-primary-800)' }}>
-                Preserved Enrolment History Log:
+            <div style={{ background: '#F8FAFC', padding: '1rem', borderRadius: 'var(--radius-md)', fontSize: '0.8rem', border: '1px solid var(--border-subtle)' }}>
+              <div style={{ fontWeight: 700, marginBottom: '0.5rem', color: 'var(--text-main)' }}>
+                Historical Enrolment Log:
               </div>
               {historyList.length === 0 ? (
-                <div style={{ color: 'var(--text-subtle)' }}>No past enrolment modifications recorded yet.</div>
+                <div style={{ color: 'var(--text-subtle)' }}>No past modifications recorded yet.</div>
               ) : (
                 <ul style={{ listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
                   {historyList.map(h => (
-                    <li key={h.id} style={{ borderBottom: '1px solid var(--border-subtle)', paddingBottom: '0.3rem' }}>
-                      <span style={{ fontWeight: 600 }}>{h.subject_title || h.subject_code}</span>: {h.action} ({h.new_status})
+                    <li key={h.id} style={{ borderBottom: '1px solid var(--border-subtle)', paddingBottom: '0.35rem' }}>
+                      <strong>{h.subject_title || h.subject_code}</strong>: {h.action} ({h.new_status})
                       <span style={{ color: 'var(--text-subtle)', marginLeft: '0.5rem', fontSize: '0.75rem' }}>
                         {new Date(h.timestamp).toLocaleString()}
                       </span>
@@ -204,7 +197,7 @@ export function SubjectEnrolmentModal({ isOpen, onClose, learner, token, onEnrol
           )}
 
           {loading ? (
-            <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>
+            <div style={{ padding: '2.5rem', textAlign: 'center', color: 'var(--text-muted)' }}>
               Loading CAPS subjects for {learner.grade}...
             </div>
           ) : (
@@ -222,15 +215,15 @@ export function SubjectEnrolmentModal({ isOpen, onClose, learner, token, onEnrol
                       type="checkbox"
                       className="enrolment-checkbox"
                       checked={isSelected}
-                      onChange={() => {}} // handled by parent onClick
+                      onChange={() => {}}
                       id={`check-${sub.code}`}
                     />
                     <div className="enrolment-details">
                       <div className="enrolment-title-row">
-                        <span className="enrolment-title">{sub.title}</span>
+                        <span className="enrolment-title" style={{ fontWeight: 700 }}>{sub.title}</span>
                         <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
                           {sub.is_core === 1 && (
-                            <span style={{ fontSize: '0.7rem', background: 'var(--color-bronze-100)', color: 'var(--color-bronze-dark)', border: '1px solid var(--border-bronze)', padding: '0.1rem 0.4rem', borderRadius: '4px', fontWeight: 600 }}>
+                            <span className="role-tag" style={{ background: '#FEF3C7', color: '#92400E' }}>
                               Core Subject
                             </span>
                           )}
@@ -239,12 +232,12 @@ export function SubjectEnrolmentModal({ isOpen, onClose, learner, token, onEnrol
                           </span>
                         </div>
                       </div>
-                      <div className="enrolment-meta" style={{ marginBottom: '0.25rem' }}>
+                      <div className="enrolment-meta" style={{ marginBottom: '0.35rem' }}>
                         {sub.description}
                       </div>
-                      <div style={{ fontSize: '0.725rem', color: 'var(--text-subtle)', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                      <div style={{ fontSize: '0.75rem', color: 'var(--text-subtle)', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
                         <BookOpen size={12} />
-                        <span>Source: {sub.caps_doc_ref}</span>
+                        <span>Reference: {sub.caps_doc_ref}</span>
                       </div>
                     </div>
                   </div>

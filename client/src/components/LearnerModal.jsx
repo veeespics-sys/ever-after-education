@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { APP_CONFIG } from '../config/appConfig';
-import { X, UserPlus, Save, ShieldAlert, Sparkles } from 'lucide-react';
+import { X, UserPlus, Save, ShieldAlert, Sparkles, User } from 'lucide-react';
 
 export function LearnerModal({ isOpen, onClose, onSaved, initialLearner = null, token }) {
   if (!isOpen) return null;
@@ -83,9 +83,11 @@ export function LearnerModal({ isOpen, onClose, onSaved, initialLearner = null, 
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-dialog" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-            {isEditing ? <Save size={20} color="var(--color-bronze-dark)" /> : <UserPlus size={20} color="var(--color-bronze-dark)" />}
-            <h3 className="modal-title font-display">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+            <div style={{ width: '38px', height: '38px', borderRadius: 'var(--radius-md)', background: '#F1F5F9', color: '#0F172A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              {isEditing ? <Save size={18} /> : <UserPlus size={18} />}
+            </div>
+            <h3 className="modal-title" style={{ margin: 0, fontSize: '1.25rem' }}>
               {isEditing ? `Edit Learner: ${initialLearner.first_name}` : 'Add New Learner'}
             </h3>
           </div>
@@ -106,7 +108,7 @@ export function LearnerModal({ isOpen, onClose, onSaved, initialLearner = null, 
             <div className="notice-box notice-privacy" style={{ margin: 0, padding: '0.75rem 1rem' }}>
               <Sparkles size={16} />
               <div style={{ fontSize: '0.8rem' }}>
-                <strong>POPIA Privacy Safeguard:</strong> We collect only the minimum required information (name and grade). We do not collect birth dates, physical addresses, or medical information.
+                <strong>POPIA Privacy Safeguard:</strong> Only essential learning info (first name and grade) is collected. We never ask for full birthdates, ID numbers, or medical data.
               </div>
             </div>
 
@@ -161,13 +163,13 @@ export function LearnerModal({ isOpen, onClose, onSaved, initialLearner = null, 
                 ))}
               </select>
               <span className="form-hint">
-                Changing a learner's grade preserves all historical learning records and assessments safely.
+                Changing a learner's grade level securely preserves their prior records.
               </span>
             </div>
 
-            {/* Avatar Selection */}
+            {/* Avatar Selector */}
             <div className="form-group">
-              <label className="form-label">Profile Icon</label>
+              <label className="form-label">Profile Avatar</label>
               <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                 {APP_CONFIG.avatarOptions.map(av => (
                   <button
@@ -175,29 +177,26 @@ export function LearnerModal({ isOpen, onClose, onSaved, initialLearner = null, 
                     type="button"
                     className={`btn btn-sm ${avatarCode === av.code ? 'btn-primary' : 'btn-secondary'}`}
                     onClick={() => setAvatarCode(av.code)}
-                    style={{ fontSize: '1rem', padding: '0.4rem 0.75rem' }}
+                    style={{ fontSize: '0.85rem', padding: '0.4rem 0.75rem' }}
                   >
                     <span>{av.icon}</span>
-                    <span style={{ fontSize: '0.75rem', marginLeft: '0.25rem' }}>{av.name}</span>
+                    <span style={{ marginLeft: '0.35rem' }}>{av.name}</span>
                   </button>
                 ))}
               </div>
             </div>
 
-            {/* Optional Notes */}
+            {/* Notes */}
             <div className="form-group">
-              <label className="form-label" htmlFor="learner-notes">Educational Notes (Parent / Tutor Only)</label>
+              <label className="form-label" htmlFor="learner-notes">Educational Notes (Parent / Tutor Eyes Only)</label>
               <textarea
                 id="learner-notes"
                 className="form-textarea"
                 rows="2"
-                placeholder="e.g. Learns well with step-by-step visual models."
+                placeholder="e.g. Enjoys visual geometry models and step-by-step algebra."
                 value={learningNotes}
                 onChange={(e) => setLearningNotes(e.target.value)}
               />
-              <span className="form-hint">
-                Confidential parent observations. Never shared with other families or public directories.
-              </span>
             </div>
           </div>
 

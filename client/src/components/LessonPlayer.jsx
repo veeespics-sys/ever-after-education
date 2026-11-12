@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { 
   CheckCircle2, AlertCircle, HelpCircle, Lightbulb, 
   ArrowLeft, ArrowRight, RotateCcw, Sparkles, Award, 
-  BookOpen, ChevronRight, Check, Send, ShieldCheck,
-  Printer, Download, Trophy, Flame, Star, FileText
+  BookOpen, Check, Trophy, Flame, Star, FileText, Lock
 } from 'lucide-react';
 import { PrintableResourceHub } from './PrintableResourceHub';
 
@@ -20,9 +19,9 @@ export function LessonPlayer({ learner, initialGrade, onBack, token }) {
   // Current problem solving state
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [selectedOptionIds, setSelectedOptionIds] = useState({});
-  const [stepStatuses, setStepStatuses] = useState({}); // { 0: 'correct', 1: 'incorrect' }
+  const [stepStatuses, setStepStatuses] = useState({});
   const [stepExplanations, setStepExplanations] = useState({});
-  const [hintsRevealed, setHintsRevealed] = useState(0); // 0, 1, 2, 3
+  const [hintsRevealed, setHintsRevealed] = useState(0);
   const [isCompleted, setIsCompleted] = useState(false);
   const [submittingStep, setSubmittingStep] = useState(false);
   const [completionData, setCompletionData] = useState(null);
@@ -112,7 +111,6 @@ export function LessonPlayer({ learner, initialGrade, onBack, token }) {
 
   const currentProblem = problems[currentIndex] || null;
 
-  // Handle MCQ Option Selection (Misconception-Driven)
   const handleSelectOption = async (stepIdx, option) => {
     if (!currentProblem || submittingStep) return;
 
@@ -150,7 +148,6 @@ export function LessonPlayer({ learner, initialGrade, onBack, token }) {
           handleProblemCompleted();
         }
       } else {
-        // Non-punitive: show immediate misconception explanation without wiping prior steps
         setStepStatuses(prev => ({ ...prev, [stepIdx]: 'incorrect' }));
       }
     } catch (err) {
@@ -160,7 +157,6 @@ export function LessonPlayer({ learner, initialGrade, onBack, token }) {
     }
   };
 
-  // Final submission of problem completion
   const handleProblemCompleted = async () => {
     if (!learner?.id || !currentProblem) return;
 
@@ -220,43 +216,44 @@ export function LessonPlayer({ learner, initialGrade, onBack, token }) {
   };
 
   return (
-    <div className="lesson-player-wrap" style={{ maxWidth: '980px', margin: '0 auto', paddingBottom: '3rem' }}>
-      {/* Top Banner: Navigation, Grade Selector & Gamification Stats */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '1rem' }}>
+    <div style={{ maxWidth: '1000px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '1.5rem', paddingBottom: '3.5rem' }}>
+      
+      {/* Top Bar: Back, Gamification & Grade Selector */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
         <button 
           id="lesson-back-btn" 
           className="btn btn-secondary btn-sm" 
           onClick={onBack}
         >
-          <ArrowLeft size={16} />
-          <span>Exit to Dashboard</span>
+          <ArrowLeft size={15} />
+          <span>Exit Dashboard</span>
         </button>
 
-        {/* Gamification Tracker Bar */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', background: '#FFFFFF', padding: '0.4rem 0.85rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: 'var(--color-bronze-dark)', fontWeight: 700, fontSize: '0.85rem' }}>
-            <Star size={16} color="var(--color-bronze-metallic)" fill="var(--color-bronze-metallic)" />
+        {/* Gamification Bar */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', background: '#FFFFFF', padding: '0.4rem 1rem', borderRadius: 'var(--radius-full)', border: '1px solid var(--border-subtle)', boxShadow: 'var(--shadow-sm)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: '#D97706', fontWeight: 700, fontSize: '0.85rem' }}>
+            <Star size={15} fill="#D97706" />
             <span>{gamification.xp} XP</span>
           </div>
-          <span style={{ color: 'var(--border-subtle)' }}>•</span>
+          <span style={{ color: 'var(--border-medium)' }}>•</span>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: '#B45309', fontWeight: 700, fontSize: '0.85rem' }}>
-            <Flame size={16} color="#F59E0B" fill="#F59E0B" />
+            <Flame size={15} fill="#F59E0B" color="#F59E0B" />
             <span>{gamification.current_streak} Day Streak</span>
           </div>
-          <span style={{ color: 'var(--border-subtle)' }}>•</span>
-          <span className="pill-badge" style={{ background: 'var(--color-primary-100)', color: 'var(--color-primary-900)', fontSize: '0.75rem' }}>
+          <span style={{ color: 'var(--border-medium)' }}>•</span>
+          <span className="verification-badge" style={{ fontSize: '0.75rem' }}>
             Lvl {gamification.level}: {gamification.title}
           </span>
         </div>
 
-        {/* Grade Selector Pills */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', background: 'var(--bg-surface-alt)', padding: '0.2rem', borderRadius: 'var(--radius-md)' }}>
+        {/* Grade Segmented Control */}
+        <div style={{ display: 'flex', background: 'var(--bg-surface-alt)', padding: '0.2rem', borderRadius: 'var(--radius-md)' }}>
           {highSchoolGrades.map(g => (
             <button
               key={g}
               id={`select-grade-${g.replace(/\s+/g, '-').toLowerCase()}`}
               className={`btn btn-sm ${selectedGrade === g ? 'btn-primary' : 'btn-ghost'}`}
-              style={{ fontSize: '0.8rem', padding: '0.3rem 0.65rem' }}
+              style={{ fontSize: '0.8rem', padding: '0.3rem 0.75rem' }}
               onClick={() => setSelectedGrade(g)}
             >
               {g}
@@ -265,36 +262,36 @@ export function LessonPlayer({ learner, initialGrade, onBack, token }) {
         </div>
       </div>
 
-      {/* Main Tabs Navigation: Practice vs Resources vs Achievements */}
-      <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem', borderBottom: '2px solid var(--border-subtle)', paddingBottom: '0.5rem' }}>
+      {/* Main Mode Tabs */}
+      <div className="tabs-bar">
         <button
-          className={`btn btn-sm ${activeMainTab === 'practice' ? 'btn-primary' : 'btn-ghost'}`}
+          className={`tab-btn ${activeMainTab === 'practice' ? 'active' : ''}`}
           onClick={() => setActiveMainTab('practice')}
         >
-          <BookOpen size={15} />
+          <BookOpen size={16} />
           <span>Interactive Math Practice</span>
         </button>
 
         <button
           id="tab-printable-resources"
-          className={`btn btn-sm ${activeMainTab === 'resources' ? 'btn-primary' : 'btn-ghost'}`}
+          className={`tab-btn ${activeMainTab === 'resources' ? 'active' : ''}`}
           onClick={() => setActiveMainTab('resources')}
         >
-          <FileText size={15} />
-          <span>Worksheets, Memos &amp; Formulas</span>
+          <FileText size={16} />
+          <span>Printable Worksheets &amp; Memos</span>
         </button>
 
         <button
           id="tab-achievements"
-          className={`btn btn-sm ${activeMainTab === 'achievements' ? 'btn-primary' : 'btn-ghost'}`}
+          className={`tab-btn ${activeMainTab === 'achievements' ? 'active' : ''}`}
           onClick={() => setActiveMainTab('achievements')}
         >
-          <Trophy size={15} />
+          <Trophy size={16} />
           <span>Milestones &amp; Badges ({gamification.badges.length})</span>
         </button>
       </div>
 
-      {/* View 1: Printable Resources Hub */}
+      {/* VIEW 1: Printable Resources Hub */}
       {activeMainTab === 'resources' && (
         <PrintableResourceHub
           grade={selectedGrade}
@@ -303,29 +300,29 @@ export function LessonPlayer({ learner, initialGrade, onBack, token }) {
         />
       )}
 
-      {/* View 2: Achievements Trophy Case */}
+      {/* VIEW 2: Achievements Showcase */}
       {activeMainTab === 'achievements' && (
-        <div className="card" style={{ background: '#FFFFFF', padding: '2rem' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '1rem' }}>
+        <div className="card">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.75rem', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '1.25rem', flexWrap: 'wrap', gap: '1rem' }}>
             <div>
-              <h2 className="font-display" style={{ color: 'var(--color-primary-900)', margin: 0, fontSize: '1.4rem' }}>
-                Your Math Journey Milestones
+              <h2 style={{ margin: 0, fontSize: '1.4rem' }}>
+                Mathematical Mastery Milestones
               </h2>
               <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', margin: '0.25rem 0 0' }}>
-                Celebrate every step of your learning. Home education is about steady mastery, not high-pressure speed.
+                Track your progress through South African CAPS high school algebra milestones.
               </p>
             </div>
             <div style={{ textAlign: 'right' }}>
-              <div style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--color-primary-800)' }}>
+              <div style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--text-main)' }}>
                 {gamification.xp} XP Earned
               </div>
-              <span className="pill-badge" style={{ background: 'var(--color-accent-100)', color: 'var(--color-accent-800)' }}>
+              <span className="role-tag" style={{ background: '#ECFDF5', color: '#065F46' }}>
                 {gamification.title}
               </span>
             </div>
           </div>
 
-          <div className="grid-3" style={{ gap: '1rem' }}>
+          <div className="grid-3">
             {[
               { id: 'badge_first_step', title: 'First Equation Solved', icon: '🌟', desc: 'Completed your first high school algebra exercise.' },
               { id: 'badge_term_tamer', title: 'Term Tamer', icon: '🛡️', desc: 'Mastered Grade 8 distributive expanding and linear isolating.' },
@@ -339,26 +336,30 @@ export function LessonPlayer({ learner, initialGrade, onBack, token }) {
                 <div
                   key={b.id}
                   style={{
-                    padding: '1.25rem',
+                    padding: '1.5rem 1.25rem',
                     borderRadius: 'var(--radius-md)',
-                    border: isUnlocked ? '2px solid var(--color-bronze-metallic)' : '1px solid var(--border-subtle)',
-                    background: isUnlocked ? '#FFFDF9' : '#FAFAFA',
-                    opacity: isUnlocked ? 1 : 0.6,
-                    textAlign: 'center'
+                    border: isUnlocked ? '2px solid #059669' : '1px solid var(--border-subtle)',
+                    background: isUnlocked ? '#F0FDF4' : '#FAFAFA',
+                    opacity: isUnlocked ? 1 : 0.65,
+                    textAlign: 'center',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    gap: '0.75rem'
                   }}
                 >
-                  <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>
-                    {b.icon}
+                  <div style={{ fontSize: '2.5rem' }}>{b.icon}</div>
+                  <div>
+                    <h4 style={{ margin: '0 0 0.35rem', color: isUnlocked ? '#065F46' : 'var(--text-subtle)' }}>
+                      {b.title}
+                    </h4>
+                    <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', margin: 0 }}>
+                      {b.desc}
+                    </p>
                   </div>
-                  <h4 style={{ margin: '0 0 0.25rem', color: isUnlocked ? 'var(--color-primary-900)' : 'var(--text-subtle)' }}>
-                    {b.title}
-                  </h4>
-                  <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', margin: 0 }}>
-                    {b.desc}
-                  </p>
-                  <div style={{ marginTop: '0.75rem' }}>
+                  <div>
                     {isUnlocked ? (
-                      <span className="verification-badge" style={{ background: '#E8F5E9', color: '#2E7D32' }}>
+                      <span className="verification-badge" style={{ background: '#D1FAE5', color: '#065F46' }}>
                         Unlocked ★
                       </span>
                     ) : (
@@ -374,15 +375,15 @@ export function LessonPlayer({ learner, initialGrade, onBack, token }) {
         </div>
       )}
 
-      {/* View 3: Interactive Practice Engine (Misconception-Driven MCQ) */}
+      {/* VIEW 3: Interactive Practice Engine */}
       {activeMainTab === 'practice' && (
-        <div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           {loading ? (
-            <div className="card" style={{ textAlign: 'center', padding: '3.5rem' }}>
-              <div style={{ fontSize: '2rem', marginBottom: '1rem' }}>📐</div>
+            <div className="card" style={{ textAlign: 'center', padding: '4rem 1.5rem' }}>
+              <div style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>📐</div>
               <h3>Loading CAPS {selectedGrade} Mathematics Module...</h3>
               <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>
-                Preparing misconception-driven steps and multi-tier hints.
+                Preparing step-by-step questions and misconception-driven hints.
               </p>
             </div>
           ) : error ? (
@@ -399,29 +400,30 @@ export function LessonPlayer({ learner, initialGrade, onBack, token }) {
               <p className="empty-state-desc">Please choose Grade 8, Grade 9, or Grade 10 above.</p>
             </div>
           ) : (
-            <div>
-              {/* Module Header Card */}
-              <div className="card" style={{ background: 'var(--bg-surface)', borderTop: '4px solid var(--color-bronze-metallic)', marginBottom: '1.5rem' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
+            <>
+              {/* Problem Header Card */}
+              <div className="card" style={{ padding: '1.5rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.25rem' }}>
                   <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.35rem' }}>
-                      <span className="pill-badge" style={{ background: 'var(--color-primary-100)', color: 'var(--color-primary-800)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.35rem', flexWrap: 'wrap' }}>
+                      <span className="role-tag" style={{ background: '#F1F5F9', color: '#1E293B' }}>
                         {currentProblem?.grade}
                       </span>
-                      <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--color-accent-700)', textTransform: 'uppercase' }}>
+                      <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#D97706', textTransform: 'uppercase' }}>
                         {currentProblem?.topic}
                       </span>
                       <span className="verification-badge">DBE CAPS Verified</span>
                     </div>
-                    <h1 className="font-display" style={{ fontSize: '1.5rem', color: 'var(--color-primary-900)', margin: '0.2rem 0' }}>
+
+                    <h1 style={{ fontSize: '1.5rem', color: 'var(--text-main)', margin: '0.2rem 0' }}>
                       {currentProblem?.title}
                     </h1>
-                    <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+                    <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: 0 }}>
                       {currentProblem?.subtopic} • {currentProblem?.capsRef}
                     </p>
                   </div>
 
-                  {/* Problem Counter & Navigation */}
+                  {/* Problem Prev/Next Pagination */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     <button
                       id="prev-problem-btn"
@@ -432,8 +434,8 @@ export function LessonPlayer({ learner, initialGrade, onBack, token }) {
                     >
                       <ArrowLeft size={14} />
                     </button>
-                    <span style={{ fontSize: '0.85rem', fontWeight: 700, padding: '0 0.5rem', color: 'var(--color-primary-800)' }}>
-                      Problem {currentIndex + 1} of {problems.length}
+                    <span style={{ fontSize: '0.85rem', fontWeight: 700, padding: '0 0.5rem', color: 'var(--text-main)' }}>
+                      {currentIndex + 1} of {problems.length}
                     </span>
                     <button
                       id="next-problem-btn"
@@ -447,8 +449,8 @@ export function LessonPlayer({ learner, initialGrade, onBack, token }) {
                   </div>
                 </div>
 
-                {/* Problem Navigation Dots */}
-                <div style={{ display: 'flex', gap: '0.4rem', marginTop: '1rem', paddingTop: '0.75rem', borderTop: '1px solid var(--border-subtle)' }}>
+                {/* Problem Dots Navigation */}
+                <div style={{ display: 'flex', gap: '0.4rem', paddingTop: '1rem', borderTop: '1px solid var(--border-subtle)', flexWrap: 'wrap' }}>
                   {problems.map((p, idx) => {
                     const prog = learnerProgress[p.id];
                     const isCurrent = idx === currentIndex;
@@ -463,27 +465,26 @@ export function LessonPlayer({ learner, initialGrade, onBack, token }) {
                         style={{
                           padding: '0.35rem 0.75rem',
                           fontSize: '0.75rem',
-                          fontWeight: 600,
+                          fontWeight: 700,
                           borderRadius: 'var(--radius-sm)',
-                          border: isCurrent ? '2px solid var(--color-primary-700)' : '1px solid var(--border-subtle)',
+                          border: isCurrent ? '2px solid #0F172A' : '1px solid var(--border-medium)',
                           background: prog?.status === 'mastered' 
-                            ? 'var(--color-success-100)' 
-                            : prog?.status === 'completed' 
-                            ? 'var(--color-primary-50)' 
+                            ? '#D1FAE5' 
                             : isCurrent 
-                            ? 'var(--bg-surface-alt)' 
-                            : '#ffffff',
+                            ? '#F8FAFC' 
+                            : '#FFFFFF',
                           color: prog?.status === 'mastered' 
-                            ? 'var(--color-success-800)' 
-                            : 'var(--color-primary-900)',
+                            ? '#065F46' 
+                            : 'var(--text-main)',
                           cursor: 'pointer',
                           display: 'flex',
                           alignItems: 'center',
-                          gap: '0.3rem'
+                          gap: '0.35rem',
+                          transition: 'all 0.15s ease'
                         }}
                       >
                         <span>#{idx + 1}</span>
-                        {prog?.status === 'mastered' && <Check size={12} color="var(--color-success-700)" />}
+                        {prog?.status === 'mastered' && <Check size={12} color="#059669" />}
                       </button>
                     );
                   })}
@@ -491,35 +492,36 @@ export function LessonPlayer({ learner, initialGrade, onBack, token }) {
               </div>
 
               {/* Problem Statement Card */}
-              <div className="card" style={{ marginBottom: '1.5rem', border: '1px solid var(--border-subtle)', background: '#FFFFFF' }}>
-                <div style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-subtle)', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
-                  Problem Statement
+              <div className="card" style={{ padding: '1.75rem' }}>
+                <div style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-subtle)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.5rem' }}>
+                  Problem Question
                 </div>
-                <div style={{ fontSize: '1.25rem', fontWeight: 600, color: 'var(--color-primary-900)', marginBottom: '0.75rem' }}>
+                <div style={{ fontSize: '1.2rem', fontWeight: 600, color: 'var(--text-main)', marginBottom: '1rem' }}>
                   {currentProblem?.questionText}
                 </div>
                 {currentProblem?.latexExpression && (
                   <div style={{
-                    background: 'var(--bg-surface-alt)',
+                    background: '#F8FAFC',
                     padding: '0.85rem 1.25rem',
                     borderRadius: 'var(--radius-md)',
-                    fontFamily: 'monospace',
-                    fontSize: '1.15rem',
-                    color: 'var(--color-bronze-dark)',
+                    fontFamily: 'var(--font-family-mono)',
+                    fontSize: '1.25rem',
+                    color: '#0F172A',
                     fontWeight: 700,
                     display: 'inline-block',
-                    borderLeft: '4px solid var(--color-bronze-metallic)'
+                    border: '1px solid var(--border-medium)',
+                    borderLeft: '4px solid #D97706'
                   }}>
                     {currentProblem.latexExpression}
                   </div>
                 )}
               </div>
 
-              {/* Multi-Step Solving Work Area (4-Option MCQ per step) */}
-              <div className="card" style={{ marginBottom: '1.5rem', background: '#FFFFFF' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                  <div style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--color-primary-900)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <BookOpen size={18} color="var(--color-bronze-dark)" />
+              {/* Step-by-Step Solving Card */}
+              <div className="card" style={{ padding: '1.75rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
+                  <div style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <BookOpen size={18} color="#D97706" />
                     <span>Line-by-Line Solution Steps</span>
                   </div>
                   <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
@@ -543,45 +545,49 @@ export function LessonPlayer({ learner, initialGrade, onBack, token }) {
                           padding: '1.25rem',
                           borderRadius: 'var(--radius-md)',
                           border: isStepFinished 
-                            ? '1px solid var(--color-success-300)' 
+                            ? '1px solid #A7F3D0' 
                             : isStepActive 
-                            ? '2px solid var(--color-primary-600)' 
+                            ? '2px solid #0F172A' 
                             : '1px solid var(--border-subtle)',
                           background: isStepFinished 
-                            ? '#F6FAF7' 
+                            ? '#F0FDF4' 
                             : isStepActive 
-                            ? '#FCFBF8' 
-                            : '#FAFAFA',
-                          opacity: isStepLocked ? 0.6 : 1,
+                            ? '#FFFFFF' 
+                            : '#F8FAFC',
+                          opacity: isStepLocked ? 0.5 : 1,
                           transition: 'all 0.2s ease'
                         }}
                       >
-                        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '0.5rem', marginBottom: '0.75rem' }}>
-                          <div style={{ fontWeight: 600, fontSize: '0.95rem', color: isStepFinished ? 'var(--color-success-800)' : 'var(--color-primary-900)' }}>
-                            {step.prompt}
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem', marginBottom: '0.75rem' }}>
+                          <div style={{ fontWeight: 600, fontSize: '0.95rem', color: isStepFinished ? '#065F46' : 'var(--text-main)' }}>
+                            Step {step.stepNumber}: {step.prompt}
                           </div>
                           {isStepFinished ? (
-                            <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', color: 'var(--color-success-700)', fontSize: '0.8rem', fontWeight: 700 }}>
+                            <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', color: '#059669', fontSize: '0.8rem', fontWeight: 700 }}>
                               <CheckCircle2 size={16} />
                               <span>Verified Correct</span>
                             </span>
                           ) : isStepActive ? (
-                            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--color-accent-700)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                              Choose Next Line
+                            <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#D97706', textTransform: 'uppercase' }}>
+                              Choose Correct Line
                             </span>
-                          ) : null}
+                          ) : (
+                            <span style={{ color: 'var(--text-subtle)', display: 'flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.75rem' }}>
+                              <Lock size={12} /> Locked
+                            </span>
+                          )}
                         </div>
 
-                        {/* Completed Step Display */}
+                        {/* Completed Step View */}
                         {isStepFinished ? (
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontFamily: 'monospace', fontSize: '1.05rem', color: 'var(--color-success-800)', background: '#FFFFFF', padding: '0.65rem 0.85rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-success-200)' }}>
-                            <Check size={16} color="var(--color-success-600)" />
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', fontFamily: 'var(--font-family-mono)', fontSize: '1.1rem', color: '#065F46', background: '#FFFFFF', padding: '0.75rem 1rem', borderRadius: 'var(--radius-sm)', border: '1px solid #A7F3D0' }}>
+                            <Check size={16} color="#059669" />
                             <strong>{step.options?.find(o => o.id === selectedOptId)?.text || step.expectedAnswer}</strong>
                           </div>
                         ) : isStepActive ? (
                           <div>
-                            {/* 4-Option MCQ Selector Area */}
-                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '0.65rem', marginBottom: '0.75rem' }}>
+                            {/* 4-Option MCQ Buttons */}
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '0.75rem', marginBottom: '0.75rem' }}>
                               {step.options?.map(opt => {
                                 const isSelected = selectedOptId === opt.id;
                                 const isWrongSelection = isSelected && hasStepFailed;
@@ -593,25 +599,26 @@ export function LessonPlayer({ learner, initialGrade, onBack, token }) {
                                     onClick={() => handleSelectOption(idx, opt)}
                                     disabled={submittingStep}
                                     style={{
-                                      padding: '0.75rem 1rem',
+                                      padding: '0.85rem 1rem',
                                       textAlign: 'left',
                                       borderRadius: 'var(--radius-sm)',
                                       border: isWrongSelection 
                                         ? '2px solid #F59E0B' 
                                         : isSelected 
-                                        ? '2px solid var(--color-primary-700)' 
-                                        : '1px solid #D6D3D1',
-                                      background: isWrongSelection ? '#FFFDF5' : '#FFFFFF',
+                                        ? '2px solid #0F172A' 
+                                        : '1px solid var(--border-medium)',
+                                      background: isWrongSelection ? '#FFFBEB' : '#FFFFFF',
                                       cursor: 'pointer',
-                                      fontFamily: 'monospace',
-                                      fontSize: '1rem',
+                                      fontFamily: 'var(--font-family-mono)',
+                                      fontSize: '1.05rem',
                                       fontWeight: 600,
-                                      color: 'var(--color-primary-900)',
-                                      transition: 'all 0.15s ease'
+                                      color: 'var(--text-main)',
+                                      transition: 'all 0.15s ease',
+                                      boxShadow: 'var(--shadow-sm)'
                                     }}
                                   >
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                      <span style={{ fontSize: '0.75rem', color: 'var(--text-subtle)', background: 'var(--bg-surface-alt)', padding: '2px 6px', borderRadius: '4px' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                                      <span style={{ fontSize: '0.75rem', color: 'var(--text-subtle)', background: 'var(--bg-surface-alt)', padding: '2px 7px', borderRadius: '4px', fontWeight: 700 }}>
                                         {opt.id.slice(-1).toUpperCase()}
                                       </span>
                                       <span>{opt.text}</span>
@@ -623,16 +630,16 @@ export function LessonPlayer({ learner, initialGrade, onBack, token }) {
 
                             {/* Misconception Diagnostic Feedback Card */}
                             {hasStepFailed && stepExplanations[idx] && (
-                              <div style={{ background: '#FFFDF5', border: '1px solid #F59E0B', borderRadius: 'var(--radius-sm)', padding: '0.75rem 1rem', marginTop: '0.5rem' }}>
-                                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem' }}>
+                              <div style={{ background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 'var(--radius-sm)', padding: '0.85rem 1rem', marginTop: '0.75rem' }}>
+                                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.6rem' }}>
                                   <AlertCircle size={18} color="#D97706" style={{ flexShrink: 0, marginTop: '2px' }} />
                                   <div>
-                                    <strong style={{ color: '#B45309', fontSize: '0.85rem' }}>CAPS Algebraic Trap Explained:</strong>
-                                    <p style={{ margin: '0.2rem 0 0', fontSize: '0.85rem', color: 'var(--text-main)', lineHeight: 1.45 }}>
+                                    <strong style={{ color: '#B45309', fontSize: '0.85rem' }}>CAPS Algebraic Trap Diagnostic:</strong>
+                                    <p style={{ margin: '0.2rem 0 0', fontSize: '0.85rem', color: 'var(--text-main)', lineHeight: 1.5 }}>
                                       {stepExplanations[idx]}
                                     </p>
-                                    <span style={{ fontSize: '0.75rem', color: 'var(--text-subtle)', display: 'block', marginTop: '0.35rem' }}>
-                                      Tip: No penalty! Review the explanation and choose the correct step above.
+                                    <span style={{ fontSize: '0.75rem', color: '#B45309', display: 'block', marginTop: '0.4rem', fontWeight: 600 }}>
+                                      No penalty! Review the explanation and select the correct step above.
                                     </span>
                                   </div>
                                 </div>
@@ -641,7 +648,7 @@ export function LessonPlayer({ learner, initialGrade, onBack, token }) {
                           </div>
                         ) : (
                           <div style={{ fontSize: '0.825rem', color: 'var(--text-subtle)', fontStyle: 'italic' }}>
-                            Complete the step above to unlock this row.
+                            Solve Step {idx} above to unlock this row.
                           </div>
                         )}
                       </div>
@@ -650,57 +657,46 @@ export function LessonPlayer({ learner, initialGrade, onBack, token }) {
                 </div>
               </div>
 
-              {/* Problem Completion Celebration Card with Gamification Micro-Interactions */}
+              {/* Completion Celebration Card */}
               {isCompleted && (
-                <div className="card" style={{ background: '#F4F8F5', border: '2px solid var(--color-success-400)', marginBottom: '1.5rem', textAlign: 'center', padding: '2rem' }}>
-                  <div style={{ width: '56px', height: '56px', borderRadius: '50%', background: 'var(--color-success-100)', color: 'var(--color-success-700)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem' }}>
+                <div className="card" style={{ background: '#ECFDF5', border: '2px solid #A7F3D0', textAlign: 'center', padding: '2.5rem 1.5rem' }}>
+                  <div style={{ width: '56px', height: '56px', borderRadius: '50%', background: '#D1FAE5', color: '#059669', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem' }}>
                     <Award size={32} />
                   </div>
-                  <h2 className="font-display" style={{ color: 'var(--color-success-800)', fontSize: '1.5rem', marginBottom: '0.5rem' }}>
+                  <h2 style={{ color: '#065F46', fontSize: '1.6rem', marginBottom: '0.5rem' }}>
                     Problem Mastered!
                   </h2>
-                  <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', maxWidth: '520px', margin: '0 auto 1.25rem' }}>
+                  <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', maxWidth: '520px', margin: '0 auto 1.5rem' }}>
                     You successfully worked through all algebraic steps for <strong>{currentProblem.title}</strong>!
                   </p>
 
                   {/* Rewards Breakdown Bar */}
-                  <div style={{ display: 'inline-flex', gap: '1.5rem', background: '#FFFFFF', padding: '0.75rem 1.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-success-200)', marginBottom: '1.5rem', flexWrap: 'wrap', justifyContent: 'center' }}>
+                  <div style={{ display: 'inline-flex', gap: '1.75rem', background: '#FFFFFF', padding: '0.85rem 2rem', borderRadius: 'var(--radius-md)', border: '1px solid #A7F3D0', marginBottom: '1.5rem', flexWrap: 'wrap', justifyContent: 'center', boxShadow: 'var(--shadow-sm)' }}>
                     <div>
-                      <div style={{ fontSize: '0.75rem', color: 'var(--text-subtle)', textTransform: 'uppercase' }}>XP Earned</div>
-                      <div style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--color-bronze-dark)' }}>
+                      <div style={{ fontSize: '0.75rem', color: 'var(--text-subtle)', textTransform: 'uppercase', fontWeight: 700 }}>XP Earned</div>
+                      <div style={{ fontSize: '1.35rem', fontWeight: 800, color: '#D97706' }}>
                         +{completionData?.gamification?.xpEarned || 65} XP
                       </div>
                     </div>
                     <div>
-                      <div style={{ fontSize: '0.75rem', color: 'var(--text-subtle)', textTransform: 'uppercase' }}>Score</div>
-                      <div style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--color-success-800)' }}>
+                      <div style={{ fontSize: '0.75rem', color: 'var(--text-subtle)', textTransform: 'uppercase', fontWeight: 700 }}>Score</div>
+                      <div style={{ fontSize: '1.35rem', fontWeight: 800, color: '#059669' }}>
                         {completionData?.progress?.score ?? 100}%
                       </div>
                     </div>
                     <div>
-                      <div style={{ fontSize: '0.75rem', color: 'var(--text-subtle)', textTransform: 'uppercase' }}>Hints Used</div>
-                      <div style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--color-primary-800)' }}>
+                      <div style={{ fontSize: '0.75rem', color: 'var(--text-subtle)', textTransform: 'uppercase', fontWeight: 700 }}>Hints Used</div>
+                      <div style={{ fontSize: '1.35rem', fontWeight: 800, color: '#0F172A' }}>
                         {hintsRevealed} / 3
                       </div>
                     </div>
                     <div>
-                      <div style={{ fontSize: '0.75rem', color: 'var(--text-subtle)', textTransform: 'uppercase' }}>Streak</div>
-                      <div style={{ fontSize: '1.3rem', fontWeight: 800, color: '#B45309' }}>
+                      <div style={{ fontSize: '0.75rem', color: 'var(--text-subtle)', textTransform: 'uppercase', fontWeight: 700 }}>Streak</div>
+                      <div style={{ fontSize: '1.35rem', fontWeight: 800, color: '#B45309' }}>
                         {gamification.current_streak} Days 🔥
                       </div>
                     </div>
                   </div>
-
-                  {/* Unlocked Badges Banner */}
-                  {completionData?.gamification?.newBadges && completionData.gamification.newBadges.length > 0 && (
-                    <div style={{ background: '#FFFDF9', border: '1px solid var(--color-bronze-metallic)', padding: '0.75rem 1rem', borderRadius: 'var(--radius-md)', maxWidth: '480px', margin: '0 auto 1.5rem' }}>
-                      <strong style={{ color: 'var(--color-bronze-dark)', fontSize: '0.85rem' }}>🎉 New Milestone Badge Unlocked!</strong>
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', marginTop: '0.35rem' }}>
-                        <span style={{ fontSize: '1.5rem' }}>{completionData.gamification.newBadges[0].icon}</span>
-                        <span style={{ fontWeight: 700, color: 'var(--color-primary-900)' }}>{completionData.gamification.newBadges[0].title}</span>
-                      </div>
-                    </div>
-                  )}
 
                   <div style={{ display: 'flex', justifyContent: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
                     <button
@@ -735,15 +731,15 @@ export function LessonPlayer({ learner, initialGrade, onBack, token }) {
               )}
 
               {/* Multi-Tier Hint Progressive System */}
-              <div className="card" style={{ background: '#FFFFFF', border: '1px solid var(--border-subtle)' }}>
+              <div className="card" style={{ padding: '1.75rem' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', marginBottom: '1rem' }}>
                   <div>
-                    <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--color-primary-900)', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                      <HelpCircle size={18} color="var(--color-accent-700)" />
+                    <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '0.4rem', margin: 0 }}>
+                      <HelpCircle size={18} color="#D97706" />
                       <span>Multi-Tier Guided Hint System</span>
                     </h3>
-                    <p style={{ fontSize: '0.825rem', color: 'var(--text-muted)' }}>
-                      Work independently first. Reveal hints progressively from broad conceptual rules to a full worked solution if stuck.
+                    <p style={{ fontSize: '0.825rem', color: 'var(--text-muted)', margin: '0.2rem 0 0' }}>
+                      Try to solve independently first. Reveal hints progressively from conceptual rules to a worked step.
                     </p>
                   </div>
 
@@ -753,47 +749,48 @@ export function LessonPlayer({ learner, initialGrade, onBack, token }) {
                     onClick={handleRequestHint}
                     disabled={hintsRevealed >= 3}
                   >
-                    <Lightbulb size={15} color="var(--color-bronze-dark)" />
+                    <Lightbulb size={15} color="#D97706" />
                     <span>
                       {hintsRevealed === 0 
                         ? 'Need a Hint? (Tier 1)' 
                         : hintsRevealed === 1 
                         ? 'Deeper Hint (Tier 2)' 
                         : hintsRevealed === 2 
-                        ? 'Reveal Worked Solution (Tier 3)' 
+                        ? 'Reveal Solution (Tier 3)' 
                         : 'All 3 Hints Unlocked'}
                     </span>
                   </button>
                 </div>
 
                 {hintsRevealed === 0 ? (
-                  <div style={{ background: 'var(--bg-surface-alt)', padding: '0.85rem 1rem', borderRadius: 'var(--radius-sm)', fontSize: '0.85rem', color: 'var(--text-subtle)', fontStyle: 'italic', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <ShieldCheck size={16} />
-                    <span>No hints revealed yet for this problem. Review the choices for Step {currentStepIndex + 1}!</span>
+                  <div style={{ background: '#F8FAFC', padding: '0.85rem 1rem', borderRadius: 'var(--radius-sm)', fontSize: '0.85rem', color: 'var(--text-subtle)', fontStyle: 'italic', display: 'flex', alignItems: 'center', gap: '0.5rem', border: '1px dashed var(--border-medium)' }}>
+                    <span>💡 No hints revealed yet for this problem. Review your choices for Step {currentStepIndex + 1}!</span>
                   </div>
                 ) : (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                    {currentProblem.hints.slice(0, hintsRevealed).map((hint, idx) => (
+                    {currentProblem.hints.slice(0, hintsRevealed).map((hint) => (
                       <div
                         key={hint.tier}
                         id={`hint-tier-${hint.tier}`}
                         style={{
-                          padding: '0.9rem 1rem',
+                          padding: '0.9rem 1.15rem',
                           borderRadius: 'var(--radius-md)',
                           borderLeft: `4px solid ${
-                            hint.tier === 1 ? 'var(--color-accent-500)' : 
-                            hint.tier === 2 ? 'var(--color-bronze-metallic)' : 
-                            'var(--color-primary-700)'
+                            hint.tier === 1 ? '#F59E0B' : 
+                            hint.tier === 2 ? '#D97706' : 
+                            '#0F172A'
                           }`,
-                          background: 'var(--bg-surface-alt)'
+                          background: '#F8FAFC',
+                          border: '1px solid var(--border-subtle)',
+                          borderLeftWidth: '4px'
                         }}
                       >
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
-                          <span style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-primary-900)' }}>
+                          <span style={{ fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase', color: 'var(--text-main)' }}>
                             Tier {hint.tier}: {hint.type}
                           </span>
-                          <span className="pill-badge" style={{ fontSize: '0.7rem' }}>
-                            Hint Level {hint.tier}
+                          <span className="role-tag" style={{ fontSize: '0.7rem' }}>
+                            Level {hint.tier}
                           </span>
                         </div>
                         <div style={{ fontSize: '0.875rem', color: 'var(--text-main)', whiteSpace: 'pre-line', lineHeight: 1.5 }}>
@@ -804,7 +801,7 @@ export function LessonPlayer({ learner, initialGrade, onBack, token }) {
                   </div>
                 )}
               </div>
-            </div>
+            </>
           )}
         </div>
       )}
